@@ -11,15 +11,11 @@ import Data.Text (pack)
 import Network.HTTP.Simple
 import System.Environment (lookupEnv)
 
+import Client (getUser, getBudgets)
+
 main :: IO ()
 main = do
-  apiKey <- S8.pack . fromMaybe "" <$> lookupEnv "API_TOKEN"
-  liftIO $ print apiKey
-  let request = setRequestHeader "Authorization" [apiKey]
-               $ "GET https://api.youneedabudget.com/v1/user"
-  response <- httpJSON request
-
-  putStrLn $ "The status code was: " ++
-             show (getResponseStatusCode response)
-  print $ getResponseHeader "Content-Type" response
-  S8.putStrLn $ Yaml.encode (getResponseBody response :: Value)
+  user <- getUser
+  print user
+  budget <- getBudgets
+  print budget
