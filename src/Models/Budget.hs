@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Models.Budget
   ( Budget(..)
-  , BudgetResponse(..)
-  , BudgetList(..)
+  , BudgetDetailResponse(..)
+  , BudgetSummaryResponse(..)
   ) where
 
 import Data.Time (UTCTime)
@@ -12,23 +12,24 @@ import qualified Data.Aeson as X
 import Data.Text (Text)
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
-newtype BudgetList = BudgetList [Budget] deriving (Show)
+newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
 
-instance FromJSON BudgetList where
+instance FromJSON BudgetSummaryResponse where
   parseJSON (Object o) = do
     respObject    <- o .: "data"
     budgetObjects <- respObject .: "budgets"
-    return $ BudgetList budgetObjects
-  parseJSON invalid = typeMismatch "BudgetList" invalid
+    return $ BudgetSummaryResponse budgetObjects
+  parseJSON invalid = typeMismatch "BudgetSummaryResponse" invalid
 
-newtype BudgetResponse = BudgetResponse Budget deriving (Show)
+-- | Model for returning a single budget from the /budget/:id endpoint.
+newtype BudgetDetailResponse = BudgetDetailResponse Budget deriving (Show)
 
-instance FromJSON BudgetResponse where
+instance FromJSON BudgetDetailResponse where
   parseJSON (Object o) = do
     respObject <- o .: "data"
     budgetObject <- respObject .: "budget"
-    return $ BudgetResponse budgetObject
-  parseJSON invalid = typeMismatch "BudgetResponse" invalid
+    return $ BudgetDetailResponse budgetObject
+  parseJSON invalid = typeMismatch "BudgetDetailResponse" invalid
 
 -- | Individual Budget data objects
 data Budget = Budget

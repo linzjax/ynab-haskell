@@ -35,7 +35,7 @@ import Network.HTTP.Simple
 import System.Environment (lookupEnv)
 
 import Models.User (User(..))
-import Models.Budget (BudgetList(..), BudgetResponse(..))
+import Models.Budget (BudgetSummaryResponse(..), BudgetDetailResponse(..))
 
 -- getEndpoint :: Request -> Response
 getEndpoint requestUrl = do
@@ -53,7 +53,7 @@ getUser = do
       print "Error"
       return Nothing
 
-getBudgets :: IO (Maybe BudgetList)
+getBudgets :: IO (Maybe BudgetSummaryResponse)
 getBudgets = do
   response <- getEndpoint "GET https://api.youneedabudget.com/v1/budgets"
   case (getResponseStatusCode response) of
@@ -62,7 +62,7 @@ getBudgets = do
       print "Error"
       return Nothing
 
-getBudget :: Text -> IO (Maybe BudgetResponse)
+getBudget :: Text -> IO (Maybe BudgetDetailResponse)
 getBudget budgetId = do
   let getBudgetUrl = "GET https://api.youneedabudget.com/v1/budgets/"
   url <- parseRequest $ unpack $ append getBudgetUrl budgetId

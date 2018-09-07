@@ -12,7 +12,7 @@ import Network.HTTP.Simple
 import System.Environment (lookupEnv)
 
 import Client (getUser, getBudgets, getBudget)
-import Models.Budget (Budget(..), BudgetList(..))
+import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 
 main :: IO ()
 main = do
@@ -21,7 +21,7 @@ main = do
   print user
   getBudgets >>= \case
     Nothing -> print "boooo"
-    Just (BudgetList budgetList) -> do
+    Just (BudgetSummaryResponse budgetList) -> do
       print "BudgetList: "
       print budgetList
       -- print budgetList
