@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, LambdaCase #-}
 
 module Main where
 
@@ -11,11 +11,21 @@ import Data.Text (pack)
 import Network.HTTP.Simple
 import System.Environment (lookupEnv)
 
-import Client (getUser, getBudgets)
+import Client (getUser, getBudgets, getBudget)
+import Models.Budget (Budget(..), BudgetList(..))
 
 main :: IO ()
 main = do
   user <- getUser
+  print "User: "
   print user
-  budget <- getBudgets
-  print budget
+  getBudgets >>= \case
+    Nothing -> print "boooo"
+    Just (BudgetList budgetList) -> do
+      print "BudgetList: "
+      print budgetList
+      -- print budgetList
+      let budget = head budgetList
+      (getBudget $ budgetId budget) >>= \case
+         Just b -> print b
+         Nothing -> print "booo"

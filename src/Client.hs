@@ -1,8 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, LambdaCase #-}
 
 module Client
   ( getUser
   , getBudgets
+  , getBudget
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -20,17 +21,21 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.Maybe (fromMaybe)
 -- import qualified Data.HashMap as M
 import Data.HashMap.Strict (toList)
-import Data.Text (Text)
+import Data.Text (Text, pack, unpack, append)
 -- import qualified Data.Yaml as Yaml
 import Data.Maybe (fromMaybe)
-import Data.Text (pack)
 import GHC.Generics (Generic)
-import Network.HTTP.Simple (setRequestHeader, httpLBS, getResponseStatusCode, getResponseHeader, getResponseBody)
+import Network.HTTP.Simple
+  ( setRequestHeader
+  , parseRequest
+  , httpLBS
+  , getResponseStatusCode
+  , getResponseHeader
+  , getResponseBody)
 import System.Environment (lookupEnv)
 
-import Models.Common (UserResponse(..), YnabResponse(..))
 import Models.User (User(..))
-import Models.Budget (BudgetList(..))
+import Models.Budget (BudgetList(..), BudgetResponse(..))
 
 -- getEndpoint :: Request -> Response
 getEndpoint requestUrl = do
@@ -48,11 +53,20 @@ getUser = do
       print "Error"
       return Nothing
 
--- getBudgets :: IO ()
 getBudgets :: IO (Maybe BudgetList)
 getBudgets = do
   response <- getEndpoint "GET https://api.youneedabudget.com/v1/budgets"
-  print response
+  case (getResponseStatusCode response) of
+    200 -> return $ decode $ getResponseBody response
+    _ -> do
+      print "Error"
+      return Nothing
+
+getBudget :: Text -> IO (Maybe BudgetResponse)
+getBudget budgetId = do
+  let getBudgetUrl = "GET https://api.youneedabudget.com/v1/budgets/"
+  url <- parseRequest $ unpack $ append getBudgetUrl budgetId
+  response <- getEndpoint $ url
   case (getResponseStatusCode response) of
     200 -> return $ decode $ getResponseBody response
     _ -> do
