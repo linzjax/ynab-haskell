@@ -28,6 +28,7 @@ import GHC.Generics (Generic)
 import Network.HTTP.Simple
   ( setRequestHeader
   , parseRequest
+  , Response(..)
   , httpLBS
   , getResponseStatusCode
   , getResponseHeader
@@ -36,6 +37,7 @@ import System.Environment (lookupEnv)
 
 import Models.User (User(..))
 import Models.Budget (BudgetSummaryResponse(..), BudgetDetailResponse(..))
+import Models.YnabError (YnabError(..))
 
 -- getEndpoint :: Request -> Response
 getEndpoint requestUrl = do
@@ -44,31 +46,48 @@ getEndpoint requestUrl = do
   response <- httpLBS req
   return response
 
-getUser :: IO (Maybe User)
+parseError = (YnabError "500" "WHOOPS"
+                        "An error occured while parsing the\
+                        \ error. Ironic, I know.")
+
+
+getUser :: IO (Either YnabError User)
 getUser = do
   response <- getEndpoint "GET https://api.youneedabudget.com/v1/user"
   case (getResponseStatusCode response) of
-    200 -> return $ decode $ getResponseBody response
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
     _ -> do
-      print "Error"
-      return Nothing
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError
 
-getBudgets :: IO (Maybe BudgetSummaryResponse)
+getBudgets :: IO (Either YnabError BudgetSummaryResponse)
 getBudgets = do
   response <- getEndpoint "GET https://api.youneedabudget.com/v1/budgets"
   case (getResponseStatusCode response) of
-    200 -> return $ decode $ getResponseBody response
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
     _ -> do
-      print "Error"
-      return Nothing
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError
 
-getBudget :: Text -> IO (Maybe BudgetDetailResponse)
+getBudget :: Text -> IO (Either YnabError BudgetDetailResponse)
 getBudget budgetId = do
   let getBudgetUrl = "GET https://api.youneedabudget.com/v1/budgets/"
   url <- parseRequest $ unpack $ append getBudgetUrl budgetId
   response <- getEndpoint $ url
   case (getResponseStatusCode response) of
-    200 -> return $ decode $ getResponseBody response
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
     _ -> do
-      print "Error"
-      return Nothing
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError

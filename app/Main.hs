@@ -20,12 +20,12 @@ main = do
   print "User: "
   print user
   getBudgets >>= \case
-    Nothing -> print "boooo"
-    Just (BudgetSummaryResponse budgetList) -> do
+    Left err -> print err
+    Right (BudgetSummaryResponse budgetList) -> do
       print "BudgetList: "
       print budgetList
       -- print budgetList
       let budget = head budgetList
       (getBudget $ budgetId budget) >>= \case
-         Just b -> print b
-         Nothing -> print "booo"
+         Right b -> print b
+         Left err -> print err
