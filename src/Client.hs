@@ -3,10 +3,10 @@
 module Client
   ( getUser
   , getBudgets
-  , getBudget
-  , getBudgetSettings
+  , getBudgetById
+  , getBudgetSettingsById
   , getAccounts
-  , getAccount
+  , getAccountById
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -86,8 +86,8 @@ getBudgets = do
         Just err -> return $ Left err
         Nothing  -> return $ Left parseError
 
-getBudget :: Text -> IO (Either YnabError BudgetDetailResponse)
-getBudget bId = do
+getBudgetById :: Text -> IO (Either YnabError BudgetDetailResponse)
+getBudgetById bId = do
   let getBudgetUrl = "GET https://api.youneedabudget.com/v1/budgets/"
   url <- parseRequest $ unpack $ append getBudgetUrl bId
   response <- getEndpoint $ url
@@ -101,8 +101,8 @@ getBudget bId = do
         Just err -> return $ Left err
         Nothing  -> return $ Left parseError
 
-getBudgetSettings :: Text -> IO (Either YnabError BudgetSettings)
-getBudgetSettings bId = do
+getBudgetSettingsById :: Text -> IO (Either YnabError BudgetSettings)
+getBudgetSettingsById bId = do
   let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
   url <- parseRequest $ unpack $ append getBudgetUrl "/settings"
   response <- getEndpoint $ url
@@ -133,8 +133,8 @@ getAccounts bId = do
         Just err -> return $ Left err
         Nothing  -> return $ Left parseError
 
-getAccount :: Text -> Text -> IO (Either YnabError AccountDetailResponse)
-getAccount bId aId = do
+getAccountById :: Text -> Text -> IO (Either YnabError AccountDetailResponse)
+getAccountById bId aId = do
   let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
   let getAccountUrl = append getBudgetUrl "/accounts/"
   url <- parseRequest $ unpack $ append getAccountUrl aId
@@ -149,3 +149,28 @@ getAccount bId aId = do
       case (decode $ getResponseBody response) of
         Just err -> return $ Left err
         Nothing  -> return $ Left parseError
+
+-- getCategories - budgetId
+-- getCategoryById - budgetId, categoryId
+--
+-- getPayees - budgetId
+-- getPayeeById - budgetId, payeeId
+--
+-- getPayeeLocations - budgetId
+-- getPayeeLocationById - budgetId, payeeLocationId
+-- getPayeeLocationByPayee - budgetId, payeeId
+--
+-- getBudgetMonths - budgetId
+-- getBudgetMonth - budgetId, Month
+--
+-- getTransactions - budgetId
+-- getTransactionsByAccount - budgetId accountId
+-- getTransactionsByCategory - budgetId categoryId
+-- getTransactionById - budgetId transactionId
+--
+-- updateTransaction - budgetId transactionId Transaction
+-- createTrasnaction - budgetId Transaction
+-- bulkCreateTransactions - budgetId [Transaction]
+--
+-- getScheduledTransactions - budgetId
+-- getScheduledTransactionById - budgetId, scheduleTransactionId

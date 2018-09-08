@@ -26,16 +26,16 @@ instance FromJSON AccountDetailResponse where
     return (AccountDetailResponse accountObj)
 
 data Account = Account
-  { accountId               :: !Text
-  , accountName             :: !Text
-  , accountType             :: !Text
-  , accountOnBudget         :: !Bool
-  , accountClosed           :: !Bool
-  , accountNote             :: !(Maybe Text)
-  , accountBalance          :: !Int
-  , accountClearedBalance   :: !Int
-  , accountUnclearedBalance :: !Int
-  , accountDeleted          :: !Bool
+  { accountId        :: !Text
+  , name             :: !Text
+  , accountType      :: !Text
+  , onBudget         :: !Bool
+  , closed           :: !Bool
+  , note             :: !(Maybe Text)
+  , balance          :: !Int
+  , clearedBalance   :: !Int
+  , unclearedBalance :: !Int
+  , deleted          :: !Bool
   } deriving (Show)
 
 instance FromJSON Account where

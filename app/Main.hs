@@ -14,10 +14,10 @@ import System.Environment (lookupEnv)
 import Client
   ( getUser
   , getBudgets
-  , getBudget
-  , getBudgetSettings
+  , getBudgetById
+  , getBudgetSettingsById
   , getAccounts
-  , getAccount)
+  , getAccountById)
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
 
@@ -34,6 +34,6 @@ main = do
          Left err -> print err
          Right (AccountsSummaryResponse accountList) -> do
            let account = head accountList
-           (getAccount (budgetId budget) (accountId account)) >>= \case
+           (getAccountById (budgetId budget) (accountId account)) >>= \case
               Left err -> print err
               Right a  -> print a
