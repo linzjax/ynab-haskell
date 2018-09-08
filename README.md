@@ -23,17 +23,18 @@ instructions on generating a token.
 Attempting to implement functionality for all endpoints listed here, as of 2018-09-06.
 
 #### User
-- [ ] [GET] /user
+- [x] [GET] /user - getUser
 
 #### Budgets
-- [ ] [GET] /budgets 
-- [ ] [GET] /budgets/{budget_id}
+- [x] [GET] /budgets - getBudget
+- [x] [GET] /budgets/{budget_id} - getBudget (budgetId :: Text)
+- [x] [GET] /budgets/{budget_id}/settings - getBudgetSettings (budgetId :: Text)
 
 #### Accounts
 The Accounts for a budget.
 
-- [ ] [GET] /budgets/{budget_id}/accounts
-- [ ] [GET] /budgets/{budget_id}/accounts/{account_id}
+- [x] [GET] /budgets/{budget_id}/accounts - getAccounts (budgetId :: Text)
+- [x] [GET] /budgets/{budget_id}/accounts/{account_id} - getAccount (budgetId :: Text) (accountId :: Text)
 
 #### Categories
 The Categories for a budget.
