@@ -7,9 +7,12 @@ module Client
   , getBudgetSettingsById
   , getAccounts
   , getAccountById
+  , getEndpoint
+  , parseUrl
   ) where
 
 import Control.Monad.IO.Class (liftIO)
+import Control.Monad.Catch (MonadThrow(..))
 import Data.Aeson
   ( Value
   , FromJSON(..)
@@ -21,10 +24,11 @@ import Data.Aeson
   )
 import qualified Data.ByteString.Char8 as S8
 import qualified Data.ByteString.Lazy.Char8 as L8
+import qualified Data.ByteString.Lazy.Internal as L
 import Data.Maybe (fromMaybe)
 -- import qualified Data.HashMap as M
 import Data.HashMap.Strict (toList)
-import Data.Text (Text, pack, unpack, append)
+import qualified Data.Text as T
 -- import qualified Data.Yaml as Yaml
 import Data.Maybe (fromMaybe)
 import GHC.Generics (Generic)
@@ -32,6 +36,7 @@ import Network.HTTP.Simple
   ( setRequestHeader
   , parseRequest
   , Response(..)
+  , Request(..)
   , httpLBS
   , getResponseStatusCode
   , getResponseHeader
@@ -48,107 +53,73 @@ import Models.Account
   , AccountDetailResponse(..))
 import Models.YnabError (YnabError(..))
 
--- getEndpoint :: Request -> Response
-getEndpoint requestUrl = do
+-- | Helpers for processesing API requests
+
+-- | Formats the full API call: url, authorization, etc.
+formatEndpoint :: Request -> IO (Response L.ByteString)
+formatEndpoint requestUrl = do
   apiKey <- S8.pack . fromMaybe "" <$> lookupEnv "API_TOKEN"
   let req = setRequestHeader "Authorization" ["Bearer " <> apiKey] $ requestUrl
   response <- httpLBS req
   return response
 
-parseError = (YnabError "500" "WHOOPS"
-                        "An error occured while parsing the\
-                        \ error. Ironic, I know.")
+-- | Formats the request url, including id variables, etc.
+-- | ex: ["GET", bId, "accounts"] -> GET "v1/budgets/<budget_id>/accounts"
+formatUrl :: (MonadThrow m) => [T.Text] -> m Request
+formatUrl urls = parseRequest
+               . T.unpack . T.append requestType
+               . T.append baseUrl
+               . T.intercalate "/" $ endpoints
+    where baseUrl = " https://api.youneedabudget.com/v1/budgets/"
+          requestType = head urls
+          endpoints = tail urls
 
+-- | Parses the response to check if the status came back 200.
+-- | If it did, try to parse into the appropriate Data Type.
+-- | If it did not, try to parse into the YnabError Data Type.
+processResponse :: (FromJSON b, Monad m)
+              => Response L.ByteString -> m (Either YnabError b)
+processResponse response =
+  case (getResponseStatusCode response) of
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
+    _ -> do
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError
+  where parseError = (YnabError "500" "WHOOPS"
+                          "An error occured while parsing the\
+                          \ error. Ironic, I know.")
+
+-- | Strings together formatting the url, putting together the request, and
+-- | finally processing the request.
+processRequest :: (FromJSON b) => [T.Text] -> IO (Either YnabError b)
+processRequest url = formatUrl url >>= formatEndpoint >>= processResponse
+
+
+-- | All endpoints for YNAB's API
 
 getUser :: IO (Either YnabError User)
-getUser = do
-  response <- getEndpoint "GET https://api.youneedabudget.com/v1/user"
-  case (getResponseStatusCode response) of
-    200 -> do
-      case (decode $ getResponseBody response) of
-        Just res -> return $ Right res
-        Nothing  -> return $ Left parseError
-    _ -> do
-      case (decode $ getResponseBody response) of
-        Just err -> return $ Left err
-        Nothing  -> return $ Left parseError
+getUser = formatEndpoint "GET https://api.youneedabudget.com/v1/user"
+      >>= processResponse
 
 getBudgets :: IO (Either YnabError BudgetSummaryResponse)
-getBudgets = do
-  response <- getEndpoint "GET https://api.youneedabudget.com/v1/budgets"
-  case (getResponseStatusCode response) of
-    200 -> do
-      case (decode $ getResponseBody response) of
-        Just res -> return $ Right res
-        Nothing  -> return $ Left parseError
-    _ -> do
-      case (decode $ getResponseBody response) of
-        Just err -> return $ Left err
-        Nothing  -> return $ Left parseError
+getBudgets = processRequest ["GET"]
 
-getBudgetById :: Text -> IO (Either YnabError BudgetDetailResponse)
-getBudgetById bId = do
-  let getBudgetUrl = "GET https://api.youneedabudget.com/v1/budgets/"
-  url <- parseRequest $ unpack $ append getBudgetUrl bId
-  response <- getEndpoint $ url
-  case (getResponseStatusCode response) of
-    200 -> do
-      case (decode $ getResponseBody response) of
-        Just res -> return $ Right res
-        Nothing  -> return $ Left parseError
-    _ -> do
-      case (decode $ getResponseBody response) of
-        Just err -> return $ Left err
-        Nothing  -> return $ Left parseError
+getBudgetById :: T.Text -> IO (Either YnabError BudgetDetailResponse)
+getBudgetById bId = processRequest ["GET", bId]
 
-getBudgetSettingsById :: Text -> IO (Either YnabError BudgetSettings)
-getBudgetSettingsById bId = do
-  let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
-  url <- parseRequest $ unpack $ append getBudgetUrl "/settings"
-  response <- getEndpoint $ url
-  print response
-  case (getResponseStatusCode response) of
-    200 -> do
-      case (decode $ getResponseBody response) of
-        Just res -> return $ Right res
-        Nothing  -> return $ Left parseError
-    _ -> do
-      case (decode $ getResponseBody response) of
-        Just err -> return $ Left err
-        Nothing  -> return $ Left parseError
+getBudgetSettingsById :: T.Text -> IO (Either YnabError BudgetSettings)
+getBudgetSettingsById bId = processRequest ["GET", bId, "settings"]
 
-getAccounts :: Text -> IO (Either YnabError AccountsSummaryResponse)
-getAccounts bId = do
-  let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
-  url <- parseRequest $ unpack $ append getBudgetUrl "/accounts"
-  response <- getEndpoint $ url
-  print response
-  case (getResponseStatusCode response) of
-    200 -> do
-      case (decode $ getResponseBody response) of
-        Just res -> return $ Right res
-        Nothing  -> return $ Left parseError
-    _ -> do
-      case (decode $ getResponseBody response) of
-        Just err -> return $ Left err
-        Nothing  -> return $ Left parseError
+getAccounts :: T.Text -> IO (Either YnabError AccountsSummaryResponse)
+getAccounts bId = processRequest ["GET", bId, "accounts"]
 
-getAccountById :: Text -> Text -> IO (Either YnabError AccountDetailResponse)
-getAccountById bId aId = do
-  let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
-  let getAccountUrl = append getBudgetUrl "/accounts/"
-  url <- parseRequest $ unpack $ append getAccountUrl aId
-  response <- getEndpoint $ url
-  print response
-  case (getResponseStatusCode response) of
-    200 -> do
-      case (decode $ getResponseBody response) of
-        Just res -> return $ Right res
-        Nothing  -> return $ Left parseError
-    _ -> do
-      case (decode $ getResponseBody response) of
-        Just err -> return $ Left err
-        Nothing  -> return $ Left parseError
+getAccountById :: T.Text -> T.Text -> IO (Either YnabError AccountDetailResponse)
+getAccountById bId aId = processRequest ["GET", bId, "accounts", aId]
+
 
 -- getCategories - budgetId
 -- getCategoryById - budgetId, categoryId
