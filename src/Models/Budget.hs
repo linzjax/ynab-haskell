@@ -3,6 +3,7 @@ module Models.Budget
   ( Budget(..)
   , BudgetDetailResponse(..)
   , BudgetSummaryResponse(..)
+  , BudgetSettings(..)
   ) where
 
 import Data.Time (UTCTime)
@@ -75,6 +76,22 @@ instance FromJSON Budget where
     o .:? "scheduled_transactions" <*>
     o .:? "scheduled_subtransactions"
   parseJSON invalid = typeMismatch "Budget" invalid
+
+
+data BudgetSettings = BudgetSettings
+  { bSettingsCurrencyFormat :: !CurrencyFormat
+  , bSettingsDateFormat     :: !DateFormat
+  } deriving Show
+
+instance FromJSON BudgetSettings where
+  parseJSON (Object o) = do
+    respObject <- o .: "data"
+    settingsObject <- respObject .: "settings"
+    sCurrencyFormat <- settingsObject .: "currency_format"
+    sDateFormat <- settingsObject .: "date_format"
+    return BudgetSettings { bSettingsCurrencyFormat = sCurrencyFormat
+                          , bSettingsDateFormat = sDateFormat }
+  parseJSON invalid = typeMismatch "BudgetSettings" invalid
 
 -- | Object for parsing out the currency format
 data CurrencyFormat = CurrencyFormat

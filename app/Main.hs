@@ -11,7 +11,7 @@ import Data.Text (pack)
 import Network.HTTP.Simple
 import System.Environment (lookupEnv)
 
-import Client (getUser, getBudgets, getBudget)
+import Client (getUser, getBudgets, getBudget, getBudgetSettings)
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 
 main :: IO ()
@@ -26,6 +26,6 @@ main = do
       print budgetList
       -- print budgetList
       let budget = head budgetList
-      (getBudget $ budgetId budget) >>= \case
+      (getBudgetSettings $ budgetId budget) >>= \case
          Right b -> print b
          Left err -> print err

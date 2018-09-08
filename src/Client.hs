@@ -4,6 +4,7 @@ module Client
   ( getUser
   , getBudgets
   , getBudget
+  , getBudgetSettings
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -36,7 +37,10 @@ import Network.HTTP.Simple
 import System.Environment (lookupEnv)
 
 import Models.User (User(..))
-import Models.Budget (BudgetSummaryResponse(..), BudgetDetailResponse(..))
+import Models.Budget
+  ( BudgetSummaryResponse(..)
+  , BudgetDetailResponse(..)
+  , BudgetSettings(..))
 import Models.YnabError (YnabError(..))
 
 -- getEndpoint :: Request -> Response
@@ -78,10 +82,26 @@ getBudgets = do
         Nothing  -> return $ Left parseError
 
 getBudget :: Text -> IO (Either YnabError BudgetDetailResponse)
-getBudget budgetId = do
+getBudget bId = do
   let getBudgetUrl = "GET https://api.youneedabudget.com/v1/budgets/"
-  url <- parseRequest $ unpack $ append getBudgetUrl budgetId
+  url <- parseRequest $ unpack $ append getBudgetUrl bId
   response <- getEndpoint $ url
+  case (getResponseStatusCode response) of
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
+    _ -> do
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError
+
+getBudgetSettings :: Text -> IO (Either YnabError BudgetSettings)
+getBudgetSettings bId = do
+  let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
+  url <- parseRequest $ unpack $ append getBudgetUrl "/settings"
+  response <- getEndpoint $ url
+  print response
   case (getResponseStatusCode response) of
     200 -> do
       case (decode $ getResponseBody response) of
