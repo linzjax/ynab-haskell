@@ -5,6 +5,8 @@ module Client
   , getBudgets
   , getBudget
   , getBudgetSettings
+  , getAccounts
+  , getAccount
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -41,6 +43,9 @@ import Models.Budget
   ( BudgetSummaryResponse(..)
   , BudgetDetailResponse(..)
   , BudgetSettings(..))
+import Models.Account
+  ( AccountsSummaryResponse(..)
+  , AccountDetailResponse(..))
 import Models.YnabError (YnabError(..))
 
 -- getEndpoint :: Request -> Response
@@ -100,6 +105,39 @@ getBudgetSettings :: Text -> IO (Either YnabError BudgetSettings)
 getBudgetSettings bId = do
   let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
   url <- parseRequest $ unpack $ append getBudgetUrl "/settings"
+  response <- getEndpoint $ url
+  print response
+  case (getResponseStatusCode response) of
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
+    _ -> do
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError
+
+getAccounts :: Text -> IO (Either YnabError AccountsSummaryResponse)
+getAccounts bId = do
+  let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
+  url <- parseRequest $ unpack $ append getBudgetUrl "/accounts"
+  response <- getEndpoint $ url
+  print response
+  case (getResponseStatusCode response) of
+    200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
+    _ -> do
+      case (decode $ getResponseBody response) of
+        Just err -> return $ Left err
+        Nothing  -> return $ Left parseError
+
+getAccount :: Text -> Text -> IO (Either YnabError AccountDetailResponse)
+getAccount bId aId = do
+  let getBudgetUrl = append "GET https://api.youneedabudget.com/v1/budgets/" bId
+  let getAccountUrl = append getBudgetUrl "/accounts/"
+  url <- parseRequest $ unpack $ append getAccountUrl aId
   response <- getEndpoint $ url
   print response
   case (getResponseStatusCode response) of

@@ -9,8 +9,9 @@ module Models.Budget
 import Data.Time (UTCTime)
 import Data.Aeson (ToJSON(..), FromJSON(..), Value(..), (.:), (.:?))
 import Data.Aeson.Types (typeMismatch)
-import qualified Data.Aeson as X
 import Data.Text (Text)
+
+import Models.Account (Account(..))
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
 newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
@@ -125,34 +126,6 @@ newtype DateFormat = DateFormat { dfFormat :: Text } deriving (Show)
 instance FromJSON DateFormat where
   parseJSON (Object o) = DateFormat <$> o .: "format"
   parseJSON invalid = typeMismatch "DateFormat" invalid
-
-
-data Account = Account
-  { acctId               :: !Text
-  , acctName             :: !Text
-  , acctType             :: !Text
-  , acctOnBudget         :: !Bool
-  , acctClosed           :: !Bool
-  , acctNote             :: !(Maybe Text)
-  , acctBalance          :: !Int
-  , acctClearedBalance   :: !Int
-  , acctUnclearedBalance :: !Int
-  , acctDeleted          :: !Bool
-  } deriving (Show)
---
-instance FromJSON Account where
-  parseJSON (Object o) = Account <$>
-    o .: "id" <*>
-    o .: "name" <*>
-    o .: "type" <*>
-    o .: "on_budget" <*>
-    o .: "closed" <*>
-    o .:? "note" <*>
-    o .: "balance" <*>
-    o .: "cleared_balance" <*>
-    o .: "uncleared_balance" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "Account" invalid
 
 
 data Payee = Payee
