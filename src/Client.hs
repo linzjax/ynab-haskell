@@ -9,6 +9,8 @@ module Client
   , getAccountById
   , getCategories
   , getCategoryById
+  , getPayees
+  , getPayeeById
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -53,6 +55,8 @@ import Models.Account
   , AccountDetailResponse(..))
 import Models.Category
   ( CategoriesResponse(..), CategoryResponse(..))
+import Models.Payee
+  ( PayeesResponse(..), PayeeResponse(..))
 import Models.YnabError (YnabError(..))
 
 -- | Helpers for processesing API requests
@@ -103,6 +107,7 @@ processRequest url = formatUrl url >>= formatEndpoint >>= processResponse
 type BudgetId = T.Text
 type AccountId = T.Text
 type CategoryId = T.Text
+type PayeeId = T.Text
 
 -- | All endpoints for YNAB's API
 getUser :: IO (Either YnabError User)
@@ -130,10 +135,14 @@ getCategories bId = processRequest ["GET", bId, "categories"]
 getCategoryById :: BudgetId -> CategoryId -> IO (Either YnabError CategoryResponse)
 getCategoryById bId cId = processRequest ["GET", bId, "categories", cId]
 
-
 -- getPayees - budgetId
+getPayees :: BudgetId -> IO (Either YnabError PayeesResponse)
+getPayees bId = processRequest ["GET", bId, "payees"]
+
 -- getPayeeById - budgetId, payeeId
---
+getPayeeById :: BudgetId -> PayeeId -> IO (Either YnabError PayeeResponse)
+getPayeeById bId pId = processRequest ["GET", bId, "payees", pId]
+
 -- getPayeeLocations - budgetId
 -- getPayeeLocationById - budgetId, payeeLocationId
 -- getPayeeLocationByPayee - budgetId, payeeId

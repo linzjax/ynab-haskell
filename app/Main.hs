@@ -20,10 +20,14 @@ import Client
   , getAccountById
   , getCategories
   , getCategoryById
+  , getPayees
+  , getPayeeById
   )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
-import Models.Category (CategoriesResponse(..), CategoryGroup(..), CategoryResponse(..), Category(..))
+import Models.Category ( CategoriesResponse(..), CategoryGroup(..)
+                       , CategoryResponse(..), Category(..))
+import Models.Payee (PayeesResponse(..), PayeeResponse(..), Payee(..))
 
 main :: IO ()
 main = do
@@ -58,3 +62,15 @@ main = do
             (getCategoryById bId cId) >>= \case
                 Left err -> print err
                 Right (CategoryResponse category) -> print "sucessfully got /categories/<cId>"
+
+      -- | test GET /payees
+      (getPayees bId) >>= \case
+          Left err -> print err
+          Right (PayeesResponse payeeList) -> do
+            print "Successfully got /payees"
+            let pId = payeeId . head $ payeeList
+
+            -- | test GET /payees/<payeeID>
+            (getPayeeById bId pId) >>= \case
+                Left err -> print err
+                Right (PayeeResponse payee) -> print payee

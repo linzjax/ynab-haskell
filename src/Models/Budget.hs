@@ -13,6 +13,7 @@ import Data.Text (Text)
 
 import Models.Account (Account(..))
 import Models.Category (CategoryGroup(..), Category(..))
+import Models.Payee (Payee(..), PayeeLocation(..))
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
 newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
@@ -127,39 +128,6 @@ newtype DateFormat = DateFormat { dfFormat :: Text } deriving (Show)
 instance FromJSON DateFormat where
   parseJSON (Object o) = DateFormat <$> o .: "format"
   parseJSON invalid = typeMismatch "DateFormat" invalid
-
-
-data Payee = Payee
-  { payeeId                :: !Text
-  , payeeName              :: !Text
-  , payeeTransferAccountId :: !(Maybe Text)
-  , payeeDeleted           :: !Bool
-  } deriving (Show)
-
-instance FromJSON Payee where
-  parseJSON (Object o) = Payee <$>
-    o .: "id" <*>
-    o .: "name" <*>
-    o .:? "transfer_account_id" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "Payee" invalid
-
-data PayeeLocation = PayeeLocation
-  { plId        :: !Text
-  , plPayeeId   :: !Text -- | TODO: This should be a reference to a Payee.
-  , plLatitude  :: !(Maybe Text)
-  , plLongitude :: !(Maybe Text)
-  , plDeleted   :: !Bool
-  } deriving (Show)
---
-instance FromJSON PayeeLocation where
-  parseJSON (Object o) = PayeeLocation <$>
-    o .: "id" <*>
-    o .: "payee_id" <*>
-    o .:? "latitude" <*>
-    o .:? "logitude" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "PayeeLocation" invalid
 
 data Month = Month
   { monthName :: !String -- | TODO: This should be a date format.
