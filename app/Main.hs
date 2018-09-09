@@ -17,9 +17,11 @@ import Client
   , getBudgetById
   , getBudgetSettingsById
   , getAccounts
-  , getAccountById)
+  , getAccountById
+  , getCategories)
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
+import Models.Category (CategoriesResponse(..), CategoryGroup(..))
 
 main :: IO ()
 main = do
@@ -29,11 +31,14 @@ main = do
   getBudgets >>= \case
     Left err -> print err
     Right (BudgetSummaryResponse budgetList) -> do
-      let budget = head budgetList
-      (getAccounts $ budgetId budget) >>= \case
+      let bId = budgetId . head $ budgetList
+      (getAccounts bId) >>= \case
          Left err -> print err
          Right (AccountsSummaryResponse accountList) -> do
-           let account = head accountList
-           (getAccountById (budgetId budget) (accountId account)) >>= \case
+           let aId = accountId . head $ accountList
+           (getAccountById bId aId) >>= \case
               Left err -> print err
               Right a  -> print a
+      (getCategories bId) >>= \case
+          Left err -> print err
+          Right (CategoriesResponse categoryGroupList) -> print categoryGroupList

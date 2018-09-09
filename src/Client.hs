@@ -7,8 +7,7 @@ module Client
   , getBudgetSettingsById
   , getAccounts
   , getAccountById
-  , getEndpoint
-  , parseUrl
+  , getCategories
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -51,6 +50,8 @@ import Models.Budget
 import Models.Account
   ( AccountsSummaryResponse(..)
   , AccountDetailResponse(..))
+import Models.Category
+  ( CategoriesResponse(..))
 import Models.YnabError (YnabError(..))
 
 -- | Helpers for processesing API requests
@@ -98,9 +99,11 @@ processResponse response =
 processRequest :: (FromJSON b) => [T.Text] -> IO (Either YnabError b)
 processRequest url = formatUrl url >>= formatEndpoint >>= processResponse
 
+type BudgetId = T.Text
+type AccountId = T.Text
+type CategoryId = T.Text
 
 -- | All endpoints for YNAB's API
-
 getUser :: IO (Either YnabError User)
 getUser = formatEndpoint "GET https://api.youneedabudget.com/v1/user"
       >>= processResponse
@@ -108,20 +111,22 @@ getUser = formatEndpoint "GET https://api.youneedabudget.com/v1/user"
 getBudgets :: IO (Either YnabError BudgetSummaryResponse)
 getBudgets = processRequest ["GET"]
 
-getBudgetById :: T.Text -> IO (Either YnabError BudgetDetailResponse)
+getBudgetById :: BudgetId -> IO (Either YnabError BudgetDetailResponse)
 getBudgetById bId = processRequest ["GET", bId]
 
-getBudgetSettingsById :: T.Text -> IO (Either YnabError BudgetSettings)
+getBudgetSettingsById :: BudgetId -> IO (Either YnabError BudgetSettings)
 getBudgetSettingsById bId = processRequest ["GET", bId, "settings"]
 
-getAccounts :: T.Text -> IO (Either YnabError AccountsSummaryResponse)
+getAccounts :: BudgetId -> IO (Either YnabError AccountsSummaryResponse)
 getAccounts bId = processRequest ["GET", bId, "accounts"]
 
-getAccountById :: T.Text -> T.Text -> IO (Either YnabError AccountDetailResponse)
+getAccountById :: BudgetId -> AccountId -> IO (Either YnabError AccountDetailResponse)
 getAccountById bId aId = processRequest ["GET", bId, "accounts", aId]
 
+getCategories :: BudgetId -> IO (Either YnabError CategoriesResponse)
+getCategories bId = processRequest ["GET", bId, "categories"]
 
--- getCategories - budgetId
+
 -- getCategoryById - budgetId, categoryId
 --
 -- getPayees - budgetId
