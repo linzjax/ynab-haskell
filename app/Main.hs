@@ -18,27 +18,43 @@ import Client
   , getBudgetSettingsById
   , getAccounts
   , getAccountById
-  , getCategories)
+  , getCategories
+  , getCategoryById
+  )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
-import Models.Category (CategoriesResponse(..), CategoryGroup(..))
+import Models.Category (CategoriesResponse(..), CategoryGroup(..), CategoryResponse(..), Category(..))
 
 main :: IO ()
 main = do
   user <- getUser
   print "User: "
   print user
+  -- | test GET /budgets
   getBudgets >>= \case
     Left err -> print err
     Right (BudgetSummaryResponse budgetList) -> do
+      print "successfully got /budgets"
       let bId = budgetId . head $ budgetList
+
+      -- | test GET /accounts
       (getAccounts bId) >>= \case
          Left err -> print err
          Right (AccountsSummaryResponse accountList) -> do
+           print "successfully got /accounts"
            let aId = accountId . head $ accountList
+           -- | test GET /accounts/<accountId>
            (getAccountById bId aId) >>= \case
               Left err -> print err
-              Right a  -> print a
+              Right a  -> print "successfully got /accounts/<aId>"
+
+      -- | test GET /categories
       (getCategories bId) >>= \case
           Left err -> print err
-          Right (CategoriesResponse categoryGroupList) -> print categoryGroupList
+          Right (CategoriesResponse categoryGroupList) -> do
+            print "Successfully got /categories"
+            let cId = categoryId . head . cgCategories . head $ categoryGroupList
+            -- | test GET /categories/<categoryId>
+            (getCategoryById bId cId) >>= \case
+                Left err -> print err
+                Right (CategoryResponse category) -> print "sucessfully got /categories/<cId>"

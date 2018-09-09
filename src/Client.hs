@@ -8,6 +8,7 @@ module Client
   , getAccounts
   , getAccountById
   , getCategories
+  , getCategoryById
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -51,7 +52,7 @@ import Models.Account
   ( AccountsSummaryResponse(..)
   , AccountDetailResponse(..))
 import Models.Category
-  ( CategoriesResponse(..))
+  ( CategoriesResponse(..), CategoryResponse(..))
 import Models.YnabError (YnabError(..))
 
 -- | Helpers for processesing API requests
@@ -126,9 +127,10 @@ getAccountById bId aId = processRequest ["GET", bId, "accounts", aId]
 getCategories :: BudgetId -> IO (Either YnabError CategoriesResponse)
 getCategories bId = processRequest ["GET", bId, "categories"]
 
+getCategoryById :: BudgetId -> CategoryId -> IO (Either YnabError CategoryResponse)
+getCategoryById bId cId = processRequest ["GET", bId, "categories", cId]
 
--- getCategoryById - budgetId, categoryId
---
+
 -- getPayees - budgetId
 -- getPayeeById - budgetId, payeeId
 --

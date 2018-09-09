@@ -1,10 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Models.Category
-  ( Category(..)
-  , CategoryGroup(..)
+  ( CategoryGroup(..)
   , CategoriesResponse(..)
-  -- , AccountsSummaryResponse(..)
-  -- , AccountDetailResponse(..)
+  , Category(..)
+  , CategoryResponse(..)
   ) where
 
 import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
@@ -22,10 +21,11 @@ instance FromJSON CategoriesResponse where
   parseJSON invalid = typeMismatch "CategoriesResponse" invalid
 
 data CategoryGroup = CategoryGroup
-  { cgId      :: !Text
-  , cgName    :: !Text
-  , cgHidden  :: !Bool
-  , cgDeleted :: !Bool
+  { cgId         :: !Text
+  , cgName       :: !Text
+  , cgHidden     :: !Bool
+  , cgDeleted    :: !Bool
+  , cgCategories :: ![Category]
   } deriving (Show)
 
 instance FromJSON CategoryGroup where
@@ -33,8 +33,18 @@ instance FromJSON CategoryGroup where
       o .: "id" <*>
       o .: "name" <*>
       o .: "hidden" <*>
-      o .: "deleted"
+      o .: "deleted" <*>
+      o .: "categories"
   parseJSON invalid = typeMismatch "CategoryGroup" invalid
+
+data CategoryResponse = CategoryResponse Category deriving Show
+
+instance FromJSON CategoryResponse where
+  parseJSON (Object o) = do
+    respObj <- o .: "data"
+    catObj <- respObj .: "category"
+    return $ CategoryResponse catObj
+  parseJSON invalid = typeMismatch "CategoryResponse" invalid
 
 data Category = Category
   { categoryId                      :: !Text

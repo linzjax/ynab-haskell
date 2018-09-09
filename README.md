@@ -26,21 +26,21 @@ Attempting to implement functionality for all endpoints listed here, as of 2018-
 - [x] [GET] /user - getUser
 
 #### Budgets
-- [x] [GET] /budgets - getBudget
-- [x] [GET] /budgets/{budget_id} - getBudget (budgetId :: Text)
-- [x] [GET] /budgets/{budget_id}/settings - getBudgetSettings (budgetId :: Text)
+- [x] [GET] /budgets - getBudgets
+- [x] [GET] /budgets/{budget_id} - getBudgetById (budgetId :: Text)
+- [x] [GET] /budgets/{budget_id}/settings - getBudgetSettingsById (budgetId :: Text)
 
 #### Accounts
 The Accounts for a budget.
 
 - [x] [GET] /budgets/{budget_id}/accounts - getAccounts (budgetId :: Text)
-- [x] [GET] /budgets/{budget_id}/accounts/{account_id} - getAccount (budgetId :: Text) (accountId :: Text)
+- [x] [GET] /budgets/{budget_id}/accounts/{account_id} - getAccountById (budgetId :: Text) (accountId :: Text)
 
 #### Categories
 The Categories for a budget.
 
-- [ ] [GET] /budgets/{budget_id}/categories
-- [ ] [GET] /budgets/{budget_id}/categories/{category_id}
+- [x] [GET] /budgets/{budget_id}/categories - getCategories (budgetId :: Text)
+- [x] [GET] /budgets/{budget_id}/categories/{category_id} - getCategoriesById (budgetId :: Text) (categoryId :: Text)
 
 #### Payees
 The Payees for a budget.
@@ -80,4 +80,4 @@ The Scheduled Transactions for a budget.
 - [ ] [GET] /budgets/{budget_id}/scheduled_transactions/{scheduled_transaction_id}
 
 ---
-Shoutout to [ConnorGriffin](https://github.com/ConnorGriffin/) for his [README.md](https://github.com/ConnorGriffin/Posh-YNAB) format inspiration. 
+Shoutout to [ConnorGriffin](https://github.com/ConnorGriffin/) for his [README.md](https://github.com/ConnorGriffin/Posh-YNAB) format inspiration.
