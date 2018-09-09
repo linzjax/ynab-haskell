@@ -22,12 +22,21 @@ import Client
   , getCategoryById
   , getPayees
   , getPayeeById
+  , getPayeeLocations
+  , getPayeeLocationById
+  , getPayeeLocationByPayee
   )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
 import Models.Category ( CategoriesResponse(..), CategoryGroup(..)
                        , CategoryResponse(..), Category(..))
-import Models.Payee (PayeesResponse(..), PayeeResponse(..), Payee(..))
+import Models.Payee
+  ( PayeesResponse(..)
+  , PayeeResponse(..)
+  , Payee(..)
+  , PayeeLocationsResponse(..)
+  , PayeeLocationResponse(..)
+  , PayeeLocation(..))
 
 main :: IO ()
 main = do
@@ -73,4 +82,23 @@ main = do
             -- | test GET /payees/<payeeID>
             (getPayeeById bId pId) >>= \case
                 Left err -> print err
-                Right (PayeeResponse payee) -> print payee
+                Right (PayeeResponse payee) -> do
+                  print "successfully got /payees/<pId>"
+
+                  -- | test GET /payee_locations
+                  (getPayeeLocations bId) >>= \case
+                      Left err -> print err
+                      Right (PayeeLocationsResponse payeeLocationList) -> do
+                        print "successfully got /payee_locations"
+                        -- | test GET /payee_locations/<payeeLocationId>
+                        -- So the problem is I don't use this feature, so I can't test it...
+                        -- let plocId = plId . head $ payeeLocationList
+                        -- (getPayeeLocationById bId plocId) >>= \case
+                        --     Left err -> print err
+                        --     Right (PayeeLocationResponse payeeLocation) -> print payeeLocation
+
+                  -- | test GET /payee_locations/<payeeId>
+                  -- | Same problem here...
+                  -- (getPayeeLocationById bId pId) >>= \case
+                  --     Left err -> print err
+                  --     Right (PayeeLocationResponse payeeLocation) -> print payeeLocation

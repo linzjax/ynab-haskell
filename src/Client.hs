@@ -11,6 +11,9 @@ module Client
   , getCategoryById
   , getPayees
   , getPayeeById
+  , getPayeeLocations
+  , getPayeeLocationById
+  , getPayeeLocationByPayee
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -49,14 +52,20 @@ import Models.User (User(..))
 import Models.Budget
   ( BudgetSummaryResponse(..)
   , BudgetDetailResponse(..)
-  , BudgetSettings(..))
+  , BudgetSettings(..)
+  , BudgetId )
 import Models.Account
   ( AccountsSummaryResponse(..)
   , AccountDetailResponse(..))
 import Models.Category
   ( CategoriesResponse(..), CategoryResponse(..))
 import Models.Payee
-  ( PayeesResponse(..), PayeeResponse(..))
+  ( PayeesResponse(..)
+  , PayeeResponse(..)
+  , PayeeId
+  , PayeeLocationsResponse(..)
+  , PayeeLocationResponse(..)
+  , PayeeLocationId )
 import Models.YnabError (YnabError(..))
 
 -- | Helpers for processesing API requests
@@ -104,10 +113,8 @@ processResponse response =
 processRequest :: (FromJSON b) => [T.Text] -> IO (Either YnabError b)
 processRequest url = formatUrl url >>= formatEndpoint >>= processResponse
 
-type BudgetId = T.Text
 type AccountId = T.Text
 type CategoryId = T.Text
-type PayeeId = T.Text
 
 -- | All endpoints for YNAB's API
 getUser :: IO (Either YnabError User)
@@ -144,9 +151,17 @@ getPayeeById :: BudgetId -> PayeeId -> IO (Either YnabError PayeeResponse)
 getPayeeById bId pId = processRequest ["GET", bId, "payees", pId]
 
 -- getPayeeLocations - budgetId
+getPayeeLocations :: BudgetId -> IO (Either YnabError PayeeLocationsResponse)
+getPayeeLocations bId = processRequest ["GET", bId, "payee_locations"]
+
 -- getPayeeLocationById - budgetId, payeeLocationId
+getPayeeLocationById :: BudgetId -> PayeeLocationId -> IO (Either YnabError PayeeLocationResponse)
+getPayeeLocationById bId plId= processRequest ["GET", bId, "payee_locations", plId]
+
 -- getPayeeLocationByPayee - budgetId, payeeId
---
+getPayeeLocationByPayee :: BudgetId -> PayeeId -> IO (Either YnabError PayeeLocationResponse)
+getPayeeLocationByPayee bId pId = processRequest ["GET", bId, "payee_locations", pId]
+
 -- getBudgetMonths - budgetId
 -- getBudgetMonth - budgetId, Month
 --

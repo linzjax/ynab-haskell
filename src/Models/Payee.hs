@@ -3,7 +3,11 @@ module Models.Payee
   ( PayeesResponse(..)
   , PayeeResponse(..)
   , Payee(..)
+  , PayeeId
+  , PayeeLocationsResponse(..)
+  , PayeeLocationResponse(..)
   , PayeeLocation(..)
+  , PayeeLocationId
   ) where
 
 import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
@@ -29,7 +33,7 @@ instance FromJSON PayeeResponse where
   parseJSON invalid = typeMismatch "PayeeResponse" invalid
 
 data Payee = Payee
-  { payeeId                :: !Text
+  { payeeId                :: !PayeeId
   , payeeName              :: !Text
   , payeeTransferAccountId :: !(Maybe Text)
   , payeeDeleted           :: !Bool
@@ -43,9 +47,30 @@ instance FromJSON Payee where
     o .: "deleted"
   parseJSON invalid = typeMismatch "Payee" invalid
 
+type PayeeId = Text
+
+data PayeeLocationsResponse =
+        PayeeLocationsResponse [PayeeLocation] deriving Show
+
+instance FromJSON PayeeLocationsResponse where
+  parseJSON (Object o) = do
+    respObj <- o .: "data"
+    plsObj <- respObj .: "payee_locations"
+    return $ PayeeLocationsResponse plsObj
+  parseJSON invalid = typeMismatch "PayeeLocationsResponse" invalid
+
+data PayeeLocationResponse = PayeeLocationResponse PayeeLocation deriving Show
+
+instance FromJSON PayeeLocationResponse where
+  parseJSON (Object o) = do
+    respObj <- o .: "data"
+    plObj <- respObj .: "payee_location"
+    return $ PayeeLocationResponse plObj
+  parseJSON invalid = typeMismatch "PayeeLocationResponse" invalid
+
 data PayeeLocation = PayeeLocation
-  { plId        :: !Text
-  , plPayeeId   :: !Text -- | TODO: This should be a reference to a Payee.
+  { plId        :: !PayeeLocationId
+  , plPayeeId   :: !PayeeId -- | TODO: This should be a reference to a Payee.
   , plLatitude  :: !(Maybe Text)
   , plLongitude :: !(Maybe Text)
   , plDeleted   :: !Bool
@@ -59,3 +84,5 @@ instance FromJSON PayeeLocation where
     o .:? "logitude" <*>
     o .: "deleted"
   parseJSON invalid = typeMismatch "PayeeLocation" invalid
+
+type PayeeLocationId = Text

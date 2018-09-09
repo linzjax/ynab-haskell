@@ -45,15 +45,16 @@ The Categories for a budget.
 #### Payees
 The Payees for a budget.
 
-- [x] [GET] /budgets/{budget_id}/payees - getPayees budgetId :: Text)
+- [x] [GET] /budgets/{budget_id}/payees - getPayees (budgetId :: Text)
 - [x] [GET] /budgets/{budget_id}/payees/{payee_id} - getPayeeById (budgetId :: Text) (payeeId :: Text)
 
 #### Payee Locations
 When you enter a transaction and specify a payee on the YNAB mobile apps, the GPS coordinates for that location are stored, with your permission, so that the next time you are in the same place (like the Grocery store) we can pre-populate nearby payees for you! It’s handy and saves you time. This resource makes these locations available. Locations will not be available for all payees.
 
-- [ ] [GET] /budgets/{budget_id}/payee_locations
-- [ ] [GET] /budgets/{budget_id}/payee_locations/{payee_location_id}
-- [ ] [GET] /budgets/{budget_id}/payees/{payee_id}/payee_locations
+- [x] [GET] /budgets/{budget_id}/payee_locations - getPayeeLocations (budgetId :: Text)
+| Note about these two: since I don't use payee locations, I currently have no idea if these end points work. They should work in theory.
+- [x] [GET] /budgets/{budget_id}/payee_locations/{payee_location_id} - getPayeeLocationById (budgetId :: Text) (plId :: Text)
+- [x] [GET] /budgets/{budget_id}/payees/{payee_id}/payee_locations - getPayeeLocations (budgetId :: Text) (payeeId :: Text)
 
 #### Months
 Each budget contains one or more months, which is where To be Budgeted, Age of Money and Category (budgeted / activity / balances) amounts are available.

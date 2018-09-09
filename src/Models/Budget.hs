@@ -4,6 +4,7 @@ module Models.Budget
   , BudgetDetailResponse(..)
   , BudgetSummaryResponse(..)
   , BudgetSettings(..)
+  , BudgetId
   ) where
 
 import Data.Time (UTCTime)
@@ -37,10 +38,10 @@ instance FromJSON BudgetDetailResponse where
 
 -- | Individual Budget data objects
 data Budget = Budget
-  { budgetId             :: !Text
+  { budgetId       :: !BudgetId
   , name           :: !Text
-  , currencyFormat :: CurrencyFormat
-  , dateFormat     :: DateFormat
+  , currencyFormat :: !CurrencyFormat
+  , dateFormat     :: !DateFormat
   , firstMonth     :: !Text
   , lastModifiedOn :: !UTCTime
   , lastMonth      :: !Text
@@ -95,6 +96,8 @@ instance FromJSON BudgetSettings where
     return BudgetSettings { bSettingsCurrencyFormat = sCurrencyFormat
                           , bSettingsDateFormat = sDateFormat }
   parseJSON invalid = typeMismatch "BudgetSettings" invalid
+
+type BudgetId = Text
 
 -- | Object for parsing out the currency format
 data CurrencyFormat = CurrencyFormat
