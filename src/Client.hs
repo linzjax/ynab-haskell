@@ -17,6 +17,9 @@ module Client
   , getBudgetMonths
   , getBudgetMonth
   , getTransactions
+  , getTransactionsByAccount
+  , getTransactionsByCategory
+  , getTransactionsByPayee
   , getTransactionById
   ) where
 
@@ -188,11 +191,21 @@ getTransactions :: BudgetId -> IO (Either YnabError TransactionsResponse)
 getTransactions bId = processRequest ["GET", bId, "transactions"]
 
 -- getTransactionsByAccount - budgetId accountId
+getTransactionsByAccount :: BudgetId -> AccountId -> IO (Either YnabError TransactionsResponse)
+getTransactionsByAccount bId aId = processRequest ["GET", bId, "accounts", aId, "transactions"]
+
 -- getTransactionsByCategory - budgetId categoryId
+getTransactionsByCategory :: BudgetId -> CategoryId -> IO (Either YnabError TransactionsResponse)
+getTransactionsByCategory bId cId = processRequest ["GET", bId, "categories", cId, "transactions"]
+
+-- getTransactionsByPayee - budgetId payeeId
+getTransactionsByPayee :: BudgetId -> PayeeId -> IO (Either YnabError TransactionsResponse)
+getTransactionsByPayee bId pId = processRequest ["GET", bId, "payees", pId, "transactions"]
 
 -- getTransactionById - budgetId transactionId
 getTransactionById :: BudgetId -> TransactionId -> IO (Either YnabError TransactionResponse)
 getTransactionById bId tId = processRequest ["GET", bId, "transactions", tId]
+
 --
 -- updateTransaction - budgetId transactionId Transaction
 -- createTrasnaction - budgetId Transaction

@@ -28,10 +28,13 @@ import Client
   , getBudgetMonths
   , getBudgetMonth
   , getTransactions
+  , getTransactionsByAccount
+  , getTransactionsByCategory
+  , getTransactionsByPayee
   , getTransactionById
   )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
-import Models.Account (AccountsSummaryResponse(..), Account(..))
+import Models.Account (AccountsSummaryResponse(..), AccountDetailResponse(..), Account(..))
 import Models.Category ( CategoriesResponse(..), CategoryGroup(..)
                        , CategoryResponse(..), Category(..))
 import Models.Payee
@@ -72,7 +75,15 @@ main = do
            -- | test GET /accounts/<accountId>
            (getAccountById bId aId) >>= \case
               Left err -> print err
-              Right a  -> print "successfully got /accounts/<aId>"
+              Right (AccountDetailResponse _)  -> do
+                print "successfully got /accounts/<aId>"
+
+           -- | test GET /accounts/{account_id}/transactions
+           (getTransactionsByAccount bId aId) >>= \case
+              Left err -> print err
+              Right (TransactionsResponse _) ->
+                print "successfully got /accounts/{account_id}/transactions"
+
 
       -- | test GET /categories
       (getCategories bId) >>= \case
@@ -83,7 +94,14 @@ main = do
             -- | test GET /categories/<categoryId>
             (getCategoryById bId cId) >>= \case
                 Left err -> print err
-                Right (CategoryResponse category) -> print "sucessfully got /categories/<cId>"
+                Right (CategoryResponse _) ->
+                  print "successfully got /categories/<cId>"
+
+            -- | test GET /categories/{category_id}/transactions
+            (getTransactionsByCategory bId cId) >>= \case
+               Left err -> print err
+               Right (TransactionsResponse _) ->
+                 print "successfully got /categories/{category_id}/transactions"
 
       -- | test GET /payees
       (getPayees bId) >>= \case
@@ -95,7 +113,7 @@ main = do
             -- | test GET /payees/<payeeID>
             (getPayeeById bId pId) >>= \case
                 Left err -> print err
-                Right (PayeeResponse payee) -> do
+                Right (PayeeResponse _) -> do
                   print "successfully got /payees/<pId>"
 
                   -- | test GET /payee_locations
@@ -115,17 +133,23 @@ main = do
                   -- (getPayeeLocationById bId pId) >>= \case
                   --     Left err -> print err
                   --     Right (PayeeLocationResponse payeeLocation) -> print payeeLocation
+
+            -- | test GET /payees/{payee_id}/transactions
+            (getTransactionsByPayee bId pId) >>= \case
+               Left err -> print err
+               Right (TransactionsResponse _) -> do
+                 print "successfully got /payees/{payee_id}/transactions"
       --
       -- | test GET /months
       (getBudgetMonths bId) >>= \case
           Left err -> print err
-          Right (MonthSummariesResponse months) -> do
+          Right (MonthSummariesResponse _) -> do
             print "successfully got /months"
 
       -- | test GET /months/{month}
       (getBudgetMonth bId "current") >>= \case
           Left err -> print err
-          Right (MonthDetailResponse month) -> do
+          Right (MonthDetailResponse _) -> do
             print "successfully got /months/current"
 
       -- | test GET /transactions
@@ -138,6 +162,5 @@ main = do
             -- | test GET /transactions/{transaction_id}
             (getTransactionById bId tId) >>= \case
                 Left err -> print err
-                Right (TransactionResponse transaction) -> do
-                  print transaction
+                Right (TransactionResponse _) -> do
                   print "successfully got /transactions/{transaction_id}"

@@ -72,11 +72,11 @@ The Transactions for a budget.
 
 - [ ] [POST] /budgets/{budget_id}/transactions/bulk
 
-- [ ] [GET] /budgets/{budget_id}/accounts/{account_id}/transactions
+- [x] [GET] /budgets/{budget_id}/accounts/{account_id}/transactions
 
-- [ ] [GET] /budgets/{budget_id}/categories/{category_id}/transactions
+- [x] [GET] /budgets/{budget_id}/categories/{category_id}/transactions
 
-- [ ] [GET] /budgets/{budget_id}/payees/{payee_id}/transactions
+- [x] [GET] /budgets/{budget_id}/payees/{payee_id}/transactions
 
 - [x] [GET] /budgets/{budget_id}/transactions/{transaction_id}
 - [ ] [PUT] /budgets/{budget_id}/transactions/{transaction_id}
