@@ -39,24 +39,24 @@ instance FromJSON BudgetDetailResponse where
 -- | Individual Budget data objects
 data Budget = Budget
   { budgetId       :: !BudgetId
-  , name           :: !Text
-  , currencyFormat :: !CurrencyFormat
-  , dateFormat     :: !DateFormat
-  , firstMonth     :: !Text
-  , lastModifiedOn :: !UTCTime
-  , lastMonth      :: !Text
+  , budgetName           :: !Text
+  , budgetCurrencyFormat :: !CurrencyFormat
+  , budgetDateFormat     :: !DateFormat
+  , budgetFirstMonth     :: !Text
+  , budgetLastModifiedOn :: !UTCTime
+  , budgetLastMonth      :: !Text
 
   -- | Not called until an individual budget is requested.
-  , accounts                 :: !(Maybe [Account])
-  , payees                   :: !(Maybe [Payee])
-  , payeeLocations           :: !(Maybe [PayeeLocation])
-  , categoryGroups           :: !(Maybe [CategoryGroup])
-  , categories               :: !(Maybe [Category])
-  , months                   :: !(Maybe [Month])
-  , transactions             :: !(Maybe [Transaction])
-  , subtransactions          :: !(Maybe [Subtransaction])
-  , scheduledTransactions    :: !(Maybe [ScheduledTransaction])
-  , scheduledSubtransactions :: !(Maybe [ScheduledSubtransaction])
+  , budgetAccounts                 :: !(Maybe [Account])
+  , budgetPayees                   :: !(Maybe [Payee])
+  , budgetPayeeLocations           :: !(Maybe [PayeeLocation])
+  , budgetCategoryGroups           :: !(Maybe [CategoryGroup])
+  , budgetCategories               :: !(Maybe [Category])
+  , budgetMonths                   :: !(Maybe [Month])
+  , budgetTransactions             :: !(Maybe [Transaction])
+  , budgetSubtransactions          :: !(Maybe [Subtransaction])
+  , budgetScheduledTransactions    :: !(Maybe [ScheduledTransaction])
+  , budgetScheduledSubtransactions :: !(Maybe [ScheduledSubtransaction])
   } deriving (Show)
 
 instance FromJSON Budget where
