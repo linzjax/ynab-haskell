@@ -16,7 +16,7 @@ import Models.Account (Account(..))
 import Models.Category (CategoryGroup(..), Category(..))
 import Models.Payee (Payee(..), PayeeLocation(..))
 import Models.Month (Month)
-import Models.Transaction (Transaction)
+import Models.Transaction (Transaction, Subtransaction)
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
 newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
@@ -134,28 +134,6 @@ instance FromJSON DateFormat where
   parseJSON (Object o) = DateFormat <$> o .: "format"
   parseJSON invalid = typeMismatch "DateFormat" invalid
 
-data Subtransaction = Subtransaction
-  { subtId                :: !Text
-  , subtTransactionId     :: !Text -- | TODO: This should connect to a transaction.
-  , subtAmount            :: !Int
-  , subtMemo              :: !(Maybe Text)
-  , subtPayeeId           :: !(Maybe Text) -- | TODO: This should connect to a payee
-  , subtCategoryId        :: !(Maybe Text) -- | TODO: This should connect to a category
-  , subtTransferAccountId :: !(Maybe String) -- | TODO: This should connect to an Account
-  , subtDeleted           :: !Bool
-  } deriving (Show)
---
-instance FromJSON Subtransaction where
-  parseJSON (Object o) = Subtransaction <$>
-    o .: "id" <*>
-    o .: "transaction_id" <*>
-    o .: "amount" <*>
-    o .:? "memo" <*>
-    o .:? "payee_id" <*>
-    o .:? "category_id" <*>
-    o .:? "transfer_account_id" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "Subtransaction" invalid
 
 data ScheduledTransaction = ScheduledTransaction
   { stId                :: !Text

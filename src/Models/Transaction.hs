@@ -4,6 +4,7 @@ module Models.Transaction
   , TransactionId
   , TransactionsResponse(..)
   , TransactionResponse(..)
+  , Subtransaction(..)
   ) where
 
 --
@@ -61,3 +62,27 @@ instance FromJSON Transaction where
     o .:? "import_id" <*>
     o .: "deleted"
   parseJSON invalid = typeMismatch "Transaction" invalid
+
+
+data Subtransaction = Subtransaction
+  { subtId                :: !Text
+  , subtTransactionId     :: !Text -- | TODO: This should connect to a transaction.
+  , subtAmount            :: !Int
+  , subtMemo              :: !(Maybe Text)
+  , subtPayeeId           :: !(Maybe Text) -- | TODO: This should connect to a payee
+  , subtCategoryId        :: !(Maybe Text) -- | TODO: This should connect to a category
+  , subtTransferAccountId :: !(Maybe String) -- | TODO: This should connect to an Account
+  , subtDeleted           :: !Bool
+  } deriving (Show)
+
+instance FromJSON Subtransaction where
+  parseJSON (Object o) = Subtransaction <$>
+    o .: "id" <*>
+    o .: "transaction_id" <*>
+    o .: "amount" <*>
+    o .:? "memo" <*>
+    o .:? "payee_id" <*>
+    o .:? "category_id" <*>
+    o .:? "transfer_account_id" <*>
+    o .: "deleted"
+  parseJSON invalid = typeMismatch "Subtransaction" invalid
