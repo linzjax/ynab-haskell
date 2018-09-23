@@ -27,6 +27,8 @@ import Client
   , getPayeeLocationByPayee
   , getBudgetMonths
   , getBudgetMonth
+  , getTransactions
+  , getTransactionById
   )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
@@ -43,6 +45,11 @@ import Models.Month
   ( Month(..)
   , MonthSummariesResponse(..)
   , MonthDetailResponse(..))
+import Models.Transaction
+  ( Transaction(..)
+  , TransactionsResponse(..)
+  , TransactionResponse(..)
+  )
 
 main :: IO ()
 main = do
@@ -113,10 +120,24 @@ main = do
       (getBudgetMonths bId) >>= \case
           Left err -> print err
           Right (MonthSummariesResponse months) -> do
-            print "successfully get /months"
+            print "successfully got /months"
 
       -- | test GET /months/{month}
       (getBudgetMonth bId "current") >>= \case
           Left err -> print err
           Right (MonthDetailResponse month) -> do
-            print "successfully get /months/current"
+            print "successfully got /months/current"
+
+      -- | test GET /transactions
+      (getTransactions bId) >>= \case
+          Left err -> print err
+          Right (TransactionsResponse transactionList) -> do
+            print "successfully got /transactions"
+            let tId = transactionId . head $ transactionList
+
+            -- | test GET /transactions/{transaction_id}
+            (getTransactionById bId tId) >>= \case
+                Left err -> print err
+                Right (TransactionResponse transaction) -> do
+                  print transaction
+                  print "successfully got /transactions/{transaction_id}"

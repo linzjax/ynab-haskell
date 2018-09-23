@@ -16,6 +16,7 @@ import Models.Account (Account(..))
 import Models.Category (CategoryGroup(..), Category(..))
 import Models.Payee (Payee(..), PayeeLocation(..))
 import Models.Month (Month)
+import Models.Transaction (Transaction)
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
 newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
@@ -132,39 +133,6 @@ newtype DateFormat = DateFormat { dfFormat :: Text } deriving (Show)
 instance FromJSON DateFormat where
   parseJSON (Object o) = DateFormat <$> o .: "format"
   parseJSON invalid = typeMismatch "DateFormat" invalid
-
-data Transaction = Transaction
-  { tranId                :: !Text
-  , tranDate              :: !Text -- | TODO: This should be a date format
-  , tranAmount            :: !Int
-  , tranMemo              :: !(Maybe Text)
-  , tranCleared           :: !Text -- | TODO: Does this have specific responses?
-  , tranApproved          :: !Bool
-  , tranFlagColor         :: !(Maybe Text) -- | TODO: Does this have specific responses?
-  , tranAccountId         :: !Text -- | TODO: This should refer to an Account obj.
-  , tranPayeeId           :: !(Maybe Text) -- | TODO: This should refer to an Payee obj.
-  , tranCategoryId        :: !(Maybe Text) -- | TODO: This should refer to an Category obj.
-  , tranTransferAccountId :: !(Maybe Text) -- | TODO: This should be an accont obj?
-  , tranImportId          :: !(Maybe Text)
-  , tranDeleted           :: !Bool
-  } deriving (Show)
-
-instance FromJSON Transaction where
-  parseJSON (Object o) = Transaction <$>
-    o .: "id" <*>
-    o .: "date" <*>
-    o .: "amount" <*>
-    o .:? "memo" <*>
-    o .: "cleared" <*>
-    o .: "approved" <*>
-    o .:? "flag_color" <*>
-    o .: "account_id" <*>
-    o .:? "payee_id" <*>
-    o .:? "category_id" <*>
-    o .:? "transfer_account_id" <*>
-    o .:? "import_id" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "Transaction" invalid
 
 data Subtransaction = Subtransaction
   { subtId                :: !Text

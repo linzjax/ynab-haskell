@@ -16,6 +16,8 @@ module Client
   , getPayeeLocationByPayee
   , getBudgetMonths
   , getBudgetMonth
+  , getTransactions
+  , getTransactionById
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -71,6 +73,11 @@ import Models.Payee
 import Models.Month
   ( MonthSummariesResponse(..)
   , MonthDetailResponse(..)
+  )
+import Models.Transaction
+  ( TransactionsResponse(..)
+  , TransactionResponse(..)
+  , TransactionId
   )
 import Models.YnabError (YnabError(..))
 
@@ -176,11 +183,16 @@ getBudgetMonths bId = processRequest ["GET", bId, "months"]
 getBudgetMonth :: BudgetId -> T.Text -> IO (Either YnabError MonthDetailResponse)
 getBudgetMonth bId month = processRequest ["GET", bId, "months", month]
 
---
 -- getTransactions - budgetId
+getTransactions :: BudgetId -> IO (Either YnabError TransactionsResponse)
+getTransactions bId = processRequest ["GET", bId, "transactions"]
+
 -- getTransactionsByAccount - budgetId accountId
 -- getTransactionsByCategory - budgetId categoryId
+
 -- getTransactionById - budgetId transactionId
+getTransactionById :: BudgetId -> TransactionId -> IO (Either YnabError TransactionResponse)
+getTransactionById bId tId = processRequest ["GET", bId, "transactions", tId]
 --
 -- updateTransaction - budgetId transactionId Transaction
 -- createTrasnaction - budgetId Transaction
