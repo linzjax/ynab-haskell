@@ -84,8 +84,8 @@ The Transactions for a budget.
 #### Scheduled Transactions
 The Scheduled Transactions for a budget.
 
-- [ ] [GET] /budgets/{budget_id}/scheduled_transactions
-- [ ] [GET] /budgets/{budget_id}/scheduled_transactions/{scheduled_transaction_id}
+- [x] [GET] /budgets/{budget_id}/scheduled_transactions
+- [x] [GET] /budgets/{budget_id}/scheduled_transactions/{scheduled_transaction_id}
 
 ---
 Shoutout to [ConnorGriffin](https://github.com/ConnorGriffin/) for his [README.md](https://github.com/ConnorGriffin/Posh-YNAB) format inspiration.

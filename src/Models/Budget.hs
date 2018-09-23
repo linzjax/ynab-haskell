@@ -17,6 +17,7 @@ import Models.Category (CategoryGroup(..), Category(..))
 import Models.Payee (Payee(..), PayeeLocation(..))
 import Models.Month (Month)
 import Models.Transaction (Transaction, Subtransaction)
+import Models.ScheduledTransaction (ScheduledTransaction, ScheduledSubtransaction)
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
 newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
@@ -133,58 +134,3 @@ newtype DateFormat = DateFormat { dfFormat :: Text } deriving (Show)
 instance FromJSON DateFormat where
   parseJSON (Object o) = DateFormat <$> o .: "format"
   parseJSON invalid = typeMismatch "DateFormat" invalid
-
-
-data ScheduledTransaction = ScheduledTransaction
-  { stId                :: !Text
-  , stDateFirst         :: !Text
-  , stDateNext          :: !Text
-  , stFrequency         :: !Text -- | TODO: Does this have specific responses?
-  , stAmount            :: !Int
-  , stMemo              :: !(Maybe Text)
-  , stFlagColor         :: !(Maybe Text) -- | TODO: Does this have specific responses?
-  , stAccountId         :: !Text -- | TODO: This should connect to an Account
-  , stPayeeId           :: !(Maybe Text) -- | TODO: This should connect to an Account
-  , stCategoryId        :: !(Maybe Text)
-  , stTransferAccountId :: !(Maybe Text)
-  , stDeleted           :: !Bool
-  } deriving (Show)
---
-instance FromJSON ScheduledTransaction where
-  parseJSON (Object o) = ScheduledTransaction <$>
-    o .: "id" <*>
-    o .: "date_first" <*>
-    o .: "date_next" <*>
-    o .: "frequency" <*>
-    o .: "amount" <*>
-    o .:? "memo" <*>
-    o .:? "flag_color" <*>
-    o .: "account_id" <*>
-    o .:? "payee_id" <*>
-    o .:? "category_id" <*>
-    o .:? "transfer_account_id" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "ScheduledTransaction" invalid
-
-data ScheduledSubtransaction = ScheduledSubtransaction
-  { sSubtId                     :: !Text
-  , sSubtScheduledTransactionId :: !Text
-  , sSubtAmount                 :: !Int
-  , sSubtMemo                   :: !(Maybe Text)
-  , sSubtPayeeId                :: !(Maybe Text)
-  , sSubtCategoryId             :: !(Maybe Text)
-  , sSubtTransferAccountId      :: !(Maybe Text)
-  , sSubtDeleted                :: !Bool
-  } deriving (Show)
---
-instance FromJSON ScheduledSubtransaction where
-  parseJSON (Object o) = ScheduledSubtransaction <$>
-    o .: "id" <*>
-    o .: "scheduled_transaction_id" <*>
-    o .: "amount" <*>
-    o .:? "memo" <*>
-    o .:? "payee_id" <*>
-    o .:? "category_id" <*>
-    o .:? "transfer_account_id" <*>
-    o .: "deleted"
-  parseJSON invalid = typeMismatch "ScheduledSubtransaction" invalid

@@ -32,6 +32,8 @@ import Client
   , getTransactionsByCategory
   , getTransactionsByPayee
   , getTransactionById
+  , getScheduledTransactions
+  , getScheduledTransactionById
   )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), AccountDetailResponse(..), Account(..))
@@ -53,6 +55,10 @@ import Models.Transaction
   , TransactionsResponse(..)
   , TransactionResponse(..)
   )
+import Models.ScheduledTransaction
+  ( ScheduledTransaction(..)
+  , ScheduledTransactionsResponse(..)
+  , ScheduledTransactionResponse(..))
 
 main :: IO ()
 main = do
@@ -162,5 +168,18 @@ main = do
             -- | test GET /transactions/{transaction_id}
             (getTransactionById bId tId) >>= \case
                 Left err -> print err
-                Right (TransactionResponse _) -> do
+                Right (TransactionResponse _) ->
                   print "successfully got /transactions/{transaction_id}"
+
+      -- | test GET /scheduled_transactions
+      (getScheduledTransactions bId) >>= \case
+          Left err -> print err
+          Right (ScheduledTransactionsResponse transactionList) -> do
+            print "successfully got /scheduled_transactions"
+            let stId = scheduledTransactionId . head $ transactionList
+
+            -- | test GET /scheduled_transactions/{scheduled_transaction_id}
+            (getScheduledTransactionById bId stId) >>= \case
+                Left err -> print err
+                Right (ScheduledTransactionResponse _) -> do
+                  print "successfully got /scheduled_transactions/{scheduled_transaction_id}"

@@ -21,6 +21,8 @@ module Client
   , getTransactionsByCategory
   , getTransactionsByPayee
   , getTransactionById
+  , getScheduledTransactions
+  , getScheduledTransactionById
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -81,6 +83,11 @@ import Models.Transaction
   ( TransactionsResponse(..)
   , TransactionResponse(..)
   , TransactionId
+  )
+import Models.ScheduledTransaction
+  ( ScheduledTransactionsResponse(..)
+  , ScheduledTransactionResponse(..)
+  , ScheduledTransactionId
   )
 import Models.YnabError (YnabError(..))
 
@@ -206,10 +213,15 @@ getTransactionsByPayee bId pId = processRequest ["GET", bId, "payees", pId, "tra
 getTransactionById :: BudgetId -> TransactionId -> IO (Either YnabError TransactionResponse)
 getTransactionById bId tId = processRequest ["GET", bId, "transactions", tId]
 
---
+
 -- updateTransaction - budgetId transactionId Transaction
 -- createTrasnaction - budgetId Transaction
 -- bulkCreateTransactions - budgetId [Transaction]
---
+
 -- getScheduledTransactions - budgetId
+getScheduledTransactions :: BudgetId -> IO (Either YnabError ScheduledTransactionsResponse)
+getScheduledTransactions bId = processRequest ["GET", bId, "scheduled_transactions"]
+
 -- getScheduledTransactionById - budgetId, scheduleTransactionId
+getScheduledTransactionById :: BudgetId -> ScheduledTransactionId -> IO (Either YnabError ScheduledTransactionResponse)
+getScheduledTransactionById bId stId = processRequest ["GET", bId, "scheduled_transactions", stId]
