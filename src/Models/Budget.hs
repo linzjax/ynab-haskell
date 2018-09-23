@@ -15,6 +15,7 @@ import Data.Text (Text)
 import Models.Account (Account(..))
 import Models.Category (CategoryGroup(..), Category(..))
 import Models.Payee (Payee(..), PayeeLocation(..))
+import Models.Month (Month)
 
 -- | Model for storing the list of budgets retrieved by the /budgets endpoint
 newtype BudgetSummaryResponse = BudgetSummaryResponse [Budget] deriving (Show)
@@ -131,30 +132,6 @@ newtype DateFormat = DateFormat { dfFormat :: Text } deriving (Show)
 instance FromJSON DateFormat where
   parseJSON (Object o) = DateFormat <$> o .: "format"
   parseJSON invalid = typeMismatch "DateFormat" invalid
-
-data Month = Month
-  { monthName :: !String -- | TODO: This should be a date format.
-  , monthNote :: !(Maybe String)
-  , monthIncome :: !(Maybe Int)
-  , monthBudgeted :: !(Maybe Int)
-  , monthActivity :: !(Maybe Int)
-  , monthToBeBudgeted :: !(Maybe Int)
-  , monthAgeOfMoney :: !(Maybe Int)
-  , monthCategories :: !(Maybe [Category])
-  } deriving (Show)
---
-instance FromJSON Month where
-  parseJSON (Object o) = Month <$>
-    o .: "month" <*>
-    o .:? "note" <*>
-    o .:? "income" <*>
-    o .:? "budgeted" <*>
-    o .:? "activity" <*>
-    o .:? "to_be_budgeted" <*>
-    o .:? "age_of_money" <*>
-    o .:? "categories"
-  parseJSON invalid = typeMismatch "Month" invalid
-
 
 data Transaction = Transaction
   { tranId                :: !Text

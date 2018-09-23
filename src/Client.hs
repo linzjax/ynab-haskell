@@ -14,6 +14,8 @@ module Client
   , getPayeeLocations
   , getPayeeLocationById
   , getPayeeLocationByPayee
+  , getBudgetMonths
+  , getBudgetMonth
   ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -66,6 +68,10 @@ import Models.Payee
   , PayeeLocationsResponse(..)
   , PayeeLocationResponse(..)
   , PayeeLocationId )
+import Models.Month
+  ( MonthSummariesResponse(..)
+  , MonthDetailResponse(..)
+  )
 import Models.YnabError (YnabError(..))
 
 -- | Helpers for processesing API requests
@@ -163,7 +169,13 @@ getPayeeLocationByPayee :: BudgetId -> PayeeId -> IO (Either YnabError PayeeLoca
 getPayeeLocationByPayee bId pId = processRequest ["GET", bId, "payee_locations", pId]
 
 -- getBudgetMonths - budgetId
+getBudgetMonths :: BudgetId -> IO (Either YnabError MonthSummariesResponse)
+getBudgetMonths bId = processRequest ["GET", bId, "months"]
+
 -- getBudgetMonth - budgetId, Month
+getBudgetMonth :: BudgetId -> T.Text -> IO (Either YnabError MonthDetailResponse)
+getBudgetMonth bId month = processRequest ["GET", bId, "months", month]
+
 --
 -- getTransactions - budgetId
 -- getTransactionsByAccount - budgetId accountId

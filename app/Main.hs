@@ -25,6 +25,8 @@ import Client
   , getPayeeLocations
   , getPayeeLocationById
   , getPayeeLocationByPayee
+  , getBudgetMonths
+  , getBudgetMonth
   )
 import Models.Budget (Budget(..), BudgetSummaryResponse(..))
 import Models.Account (AccountsSummaryResponse(..), Account(..))
@@ -37,6 +39,10 @@ import Models.Payee
   , PayeeLocationsResponse(..)
   , PayeeLocationResponse(..)
   , PayeeLocation(..))
+import Models.Month
+  ( Month(..)
+  , MonthSummariesResponse(..)
+  , MonthDetailResponse(..))
 
 main :: IO ()
 main = do
@@ -102,3 +108,15 @@ main = do
                   -- (getPayeeLocationById bId pId) >>= \case
                   --     Left err -> print err
                   --     Right (PayeeLocationResponse payeeLocation) -> print payeeLocation
+      --
+      -- | test GET /months
+      (getBudgetMonths bId) >>= \case
+          Left err -> print err
+          Right (MonthSummariesResponse months) -> do
+            print "successfully get /months"
+
+      -- | test GET /months/{month}
+      (getBudgetMonth bId "current") >>= \case
+          Left err -> print err
+          Right (MonthDetailResponse month) -> do
+            print "successfully get /months/current"
