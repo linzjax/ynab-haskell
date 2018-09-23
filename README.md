@@ -61,8 +61,8 @@ When you enter a transaction and specify a payee on the YNAB mobile apps, the GP
 #### Months
 Each budget contains one or more months, which is where To be Budgeted, Age of Money and Category (budgeted / activity / balances) amounts are available.
 
-- [ ] [GET] /budgets/{budget_id}/months
-- [ ] [GET] /budgets/{budget_id}/months/{month}
+- [x] [GET] /budgets/{budget_id}/months -- getBudgetMonths (budgetId :: Text)
+- [x] [GET] /budgets/{budget_id}/months/{month} -- getBudgetMonth (budgetId :: Text) (monthstring :: Text (i.e. "2018-09-01" or "current"))
 
 #### Transactions
 The Transactions for a budget.
