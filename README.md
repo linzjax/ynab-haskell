@@ -69,10 +69,15 @@ The Transactions for a budget.
 
 - [ ] [GET] /budgets/{budget_id}/transactions
 - [ ] [POST] /budgets/{budget_id}/transactions
+
 - [ ] [POST] /budgets/{budget_id}/transactions/bulk
+
 - [ ] [GET] /budgets/{budget_id}/accounts/{account_id}/transactions
+
 - [ ] [GET] /budgets/{budget_id}/categories/{category_id}/transactions
+
 - [ ] [GET] /budgets/{budget_id}/payees/{payee_id}/transactions
+
 - [ ] [GET] /budgets/{budget_id}/transactions/{transaction_id}
 - [ ] [PUT] /budgets/{budget_id}/transactions/{transaction_id}
 
