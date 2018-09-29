@@ -68,7 +68,10 @@ Each budget contains one or more months, which is where To be Budgeted, Age of M
 The Transactions for a budget.
 
 - [x] [GET] /budgets/{budget_id}/transactions
-- [ ] [POST] /budgets/{budget_id}/transactions
+- [x] [POST] /budgets/{budget_id}/transactions
+        -- postTransaction (budgetId :: Text) (SaveTransactionWrapper (transaction :: SaveTransaction))
+        -- postTransactions (budgetId :: Text) (SaveTransactionsWrapper (transactions :: [SaveTransaction]))
+
 
 - [ ] [POST] /budgets/{budget_id}/transactions/bulk
 
