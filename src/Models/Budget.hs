@@ -14,6 +14,8 @@ import Data.Text (Text)
 
 import Models.Account (Account(..))
 import Models.Category (CategoryGroup(..), Category(..))
+import Models.CurrencyFormat (CurrencyFormat(..))
+import Models.DateFormat (DateFormat(..))
 import Models.Payee (Payee(..), PayeeLocation(..))
 import Models.Month (Month)
 import Models.Transaction (Transaction, Subtransaction)
@@ -101,36 +103,3 @@ instance FromJSON BudgetSettings where
   parseJSON invalid = typeMismatch "BudgetSettings" invalid
 
 type BudgetId = Text
-
--- | Object for parsing out the currency format
-data CurrencyFormat = CurrencyFormat
-  { cfCurrencySymbol   :: !Text
-  , cfDecimalDigits    :: !Int
-  , cfDecimalSeparator :: !Text
-  , cfDisplaySymbol    :: !Bool
-  , cfExampleFormat    :: !Text
-  , cfGroupSeparator   :: !Text
-  , cfISOCode          :: !Text
-  , cfSymbolFirst      :: !Bool
-  } deriving (Show)
-
-instance FromJSON CurrencyFormat where
-  parseJSON (Object o) = CurrencyFormat <$>
-    o .: "currency_symbol" <*>
-    o .: "decimal_digits" <*>
-    o .: "decimal_separator" <*>
-    o .: "display_symbol" <*>
-    o .: "example_format" <*>
-    o .: "group_separator" <*>
-    o .: "iso_code" <*>
-    o .: "symbol_first"
-  parseJSON invalid = typeMismatch "CurrencyFormat" invalid
-
--- | Object for storing the date format.
--- | TODO: actually use this to format dates correctly
--- | parseTimeM True defaultTimeLocale "%-m/%-d/%Y" "4/30/2018" :: Maybe Day
-newtype DateFormat = DateFormat { dfFormat :: Text } deriving (Show)
-
-instance FromJSON DateFormat where
-  parseJSON (Object o) = DateFormat <$> o .: "format"
-  parseJSON invalid = typeMismatch "DateFormat" invalid
