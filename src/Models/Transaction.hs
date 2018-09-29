@@ -6,7 +6,10 @@ module Models.Transaction
   , TransactionResponse(..)
   , Subtransaction(..)
   , SaveTransaction(..)
+  , SaveTransactionWrapper(..)
+  , SaveTransactionsWrapper(..)
   , SaveTransactionResponse(..)
+  , SaveTransactionsResponse(..)
   ) where
 
 --
@@ -35,6 +38,7 @@ instance FromJSON TransactionsResponse where
     return (TransactionsResponse transactionsObj)
   parseJSON invalid = typeMismatch "TransactionsResponse" invalid
 
+
 data TransactionResponse = TransactionResponse Transaction deriving Show
 
 instance FromJSON TransactionResponse where
@@ -43,6 +47,9 @@ instance FromJSON TransactionResponse where
     transactionObj <- respObj .: "transaction"
     return (TransactionResponse transactionObj)
   parseJSON invalid = typeMismatch "TransactionResponse" invalid
+
+
+
 
 type TransactionId = Text
 
@@ -105,7 +112,25 @@ instance FromJSON Subtransaction where
     o .: "deleted"
   parseJSON invalid = typeMismatch "Subtransaction" invalid
 
-data SaveTransactionResponse = SaveTransactionResponse SaveTransactionWrapper deriving Show
+data SaveTransactionsResponse = SaveTransactionsResponse SaveTransactionsResponseWrapper deriving Show
+
+instance FromJSON SaveTransactionsResponse where
+  parseJSON (Object o) = do
+    respObj <- o .: "data"
+    return (SaveTransactionsResponse respObj)
+  parseJSON invalid = typeMismatch "SaveTransactionsResponse" invalid
+
+--
+data SaveTransactionsResponseWrapper = SaveTransactionsResponseWrapper [TransactionId] [Transaction] deriving Show
+
+instance FromJSON SaveTransactionsResponseWrapper where
+  parseJSON (Object o) = SaveTransactionsResponseWrapper <$>
+    o .: "transaction_ids" <*>
+    o .: "transactions"
+  parseJSON invalid = typeMismatch "SaveTransactionsResponseWrapper" invalid
+
+
+data SaveTransactionResponse = SaveTransactionResponse SaveTransactionResponseWrapper deriving Show
 
 instance FromJSON SaveTransactionResponse where
   parseJSON (Object o) = do
@@ -113,33 +138,53 @@ instance FromJSON SaveTransactionResponse where
     return (SaveTransactionResponse respObj)
   parseJSON invalid = typeMismatch "SaveTransactionResponse" invalid
 
-data SaveTransactionWrapper = SaveTransactionWrapper [TransactionId] Transaction deriving Show
 
-instance FromJSON SaveTransactionWrapper where
-  parseJSON (Object o) = SaveTransactionWrapper <$>
+data SaveTransactionResponseWrapper = SaveTransactionResponseWrapper [TransactionId] Transaction deriving Show
+
+instance FromJSON SaveTransactionResponseWrapper where
+  parseJSON (Object o) = SaveTransactionResponseWrapper <$>
     o .: "transaction_ids" <*>
     o .: "transaction"
-  parseJSON invalid = typeMismatch "SaveTransactionWrapper" invalid
+  parseJSON invalid = typeMismatch "SaveTransactionResponseWrapper" invalid
 
 data SaveTransaction = SaveTransaction
   { saveAccountId   :: !AccountId
   , saveDate        :: !Text
   , saveAmount      :: !Int
-  -- , savePayeeId     :: !(Maybe PayeeId)
-  -- , savePayeeName   :: !(Maybe Text)
-  -- , saveCategoryId  :: !(Maybe CategoryId)
-  -- , saveMemo        :: !(Maybe Text)
-  -- , saveCleared     :: !(Maybe Text) -- [cleared, uncleared, reconciled]
-  -- , savedApproved   :: !(Maybe Bool)
-  -- , saveFlagColor   :: !(Maybe Text) -- [red, orange, yellow, green, blue, purple]
-  -- , saveImportId    :: !(Maybe Text) -- 'YNAB:-294230:2015-12-30:1’
+  , savePayeeId     :: !(Maybe PayeeId)
+  , savePayeeName   :: !(Maybe Text)
+  , saveCategoryId  :: !(Maybe CategoryId)
+  , saveMemo        :: !(Maybe Text)
+  , saveCleared     :: !(Maybe Text) -- [cleared, uncleared, reconciled]
+  , saveApproved    :: !(Maybe Bool)
+  , saveFlagColor   :: !(Maybe Text) -- [red, orange, yellow, green, blue, purple]
+  , saveImportId    :: !(Maybe Text) -- 'YNAB:-294230:2015-12-30:1’
   }
 
 instance ToJSON SaveTransaction where
-  toJSON (SaveTransaction saId sDate sAmount) = object
-    ["transaction" .= object
-      [ "account_id" .= saId
-      , "date" .= sDate
-      , "amount" .= sAmount
-      ]
-    ]
+  toJSON (SaveTransaction saId sDate sAmount sPayeeId sPayeeName sCategoryId
+                         sMemo sCleared sApproved sFlagColor sImportId) =
+    object [ "account_id" .= saId
+           , "date" .= sDate
+           , "amount" .= sAmount
+           , "payee_id" .= sPayeeId
+           , "payee_name" .= sPayeeName
+           , "category_id" .= sCategoryId
+           , "memo" .= sMemo
+           , "cleared" .= sCleared
+           , "approved" .= sApproved
+           , "flag_color" .= sFlagColor
+           , "import_id" .= sImportId
+           ]
+
+data SaveTransactionWrapper = SaveTransactionWrapper SaveTransaction
+
+instance ToJSON SaveTransactionWrapper where
+  toJSON (SaveTransactionWrapper transaction) = object
+    [ "transaction" .= transaction ]
+
+data SaveTransactionsWrapper = SaveTransactionsWrapper [SaveTransaction]
+
+instance ToJSON SaveTransactionsWrapper where
+  toJSON (SaveTransactionsWrapper transactions) = object
+    [ "transactions" .= transactions ]

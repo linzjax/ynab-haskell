@@ -22,6 +22,7 @@ module Client
   , getTransactionsByPayee
   , getTransactionById
   , postTransaction
+  , postTransactions
   , getScheduledTransactions
   , getScheduledTransactionById
   ) where
@@ -29,6 +30,7 @@ module Client
 import Control.Monad.Catch (MonadThrow(..))
 import Data.Aeson
   ( FromJSON(..)
+  , ToJSON(..)
   , decode
   )
 import qualified Data.ByteString.Char8 as S8
@@ -72,7 +74,9 @@ import Models.Transaction
   ( TransactionsResponse(..)
   , TransactionResponse(..)
   , TransactionId
-  , SaveTransaction(..)
+  , SaveTransactionWrapper(..)
+  , SaveTransactionsWrapper(..)
+  , SaveTransactionsResponse(..)
   , SaveTransactionResponse(..)
   )
 import Models.ScheduledTransaction
@@ -84,11 +88,19 @@ import Models.YnabError (YnabError(..))
 
 -- | Helpers for processesing API requests
 
--- | Formats the full API call: url, authorization, etc.
-formatEndpoint :: Request -> IO (Response L.ByteString)
-formatEndpoint requestUrl = do
+-- | Formats full GET API calls: url, authorization, etc.
+formatGetRequest :: Request -> IO (Response L.ByteString)
+formatGetRequest requestUrl = do
   apiKey <- S8.pack . fromMaybe "" <$> lookupEnv "API_TOKEN"
   let req = setRequestHeader "Authorization" ["Bearer " <> apiKey] $ requestUrl
+  response <- httpLBS req
+  return response
+
+-- | Formats full POST API calls: url, authorization, body, etc.
+formatPostRequest :: (ToJSON a) => a -> Request -> IO (Response L.ByteString)
+formatPostRequest body requestUrl = do
+  apiKey <- S8.pack . fromMaybe "" <$> lookupEnv "API_TOKEN"
+  let req = setRequestHeader "Authorization" ["Bearer " <> apiKey] $ setRequestBodyJSON body $ requestUrl
   response <- httpLBS req
   return response
 
@@ -129,14 +141,18 @@ processResponse response =
 -- | Strings together formatting the url, putting together the request, and
 -- | finally processing the request.
 processRequest :: (FromJSON b) => [T.Text] -> IO (Either YnabError b)
-processRequest url = formatUrl url >>= formatEndpoint >>= processResponse
+processRequest url = formatUrl url >>= formatGetRequest >>= processResponse
+
+processPostRequest :: (ToJSON a, FromJSON b) => [T.Text] -> a -> IO (Either YnabError b)
+processPostRequest url body =
+  formatUrl url >>= formatPostRequest body >>= processResponse
 
 type AccountId = T.Text
 type CategoryId = T.Text
 
 -- | All endpoints for YNAB's API
 getUser :: IO (Either YnabError User)
-getUser = formatEndpoint "GET https://api.youneedabudget.com/v1/user"
+getUser = formatGetRequest "GET https://api.youneedabudget.com/v1/user"
       >>= processResponse
 
 getBudgets :: IO (Either YnabError BudgetSummaryResponse)
@@ -208,17 +224,11 @@ getTransactionsByPayee bId pId = processRequest ["GET", bId, "payees", pId, "tra
 getTransactionById :: BudgetId -> TransactionId -> IO (Either YnabError TransactionResponse)
 getTransactionById bId tId = processRequest ["GET", bId, "transactions", tId]
 
-postTransaction :: BudgetId -> SaveTransaction -> IO (Either YnabError SaveTransactionResponse)
-postTransaction bId transaction = do
-  requestUrl <-  formatUrl ["POST", bId, "transactions"]
-  apiKey <- S8.pack . fromMaybe "" <$> lookupEnv "API_TOKEN"
-  let req = setRequestHeader "Authorization" ["Bearer " <> apiKey] . setRequestBodyJSON transaction $ requestUrl
-  response <- httpLBS req
-  print response
-  finalResponse <- processResponse response
-  return finalResponse
+postTransaction :: BudgetId -> SaveTransactionWrapper -> IO (Either YnabError SaveTransactionResponse)
+postTransaction bId transaction = processPostRequest ["POST", bId, "transactions"] transaction
 
--- postTransactions :: BudgetId -> [SaveTransactions] -> IO (Either YnabError SaveTransactionSummaryResponse)
+postTransactions :: BudgetId -> SaveTransactionsWrapper -> IO (Either YnabError SaveTransactionsResponse)
+postTransactions bId transactions = processPostRequest ["POST", bId, "transactions"] transactions
 
 -- updateTransaction - budgetId transactionId Transaction
 -- createTrasnaction - budgetId Transaction

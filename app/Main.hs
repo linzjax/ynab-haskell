@@ -24,6 +24,7 @@ import Client
   , getTransactionsByPayee
   , getTransactionById
   , postTransaction
+  , postTransactions
   , getScheduledTransactions
   , getScheduledTransactionById
   )
@@ -46,7 +47,10 @@ import Models.Transaction
   , TransactionsResponse(..)
   , TransactionResponse(..)
   , SaveTransaction(..)
+  , SaveTransactionWrapper(..)
+  , SaveTransactionsWrapper(..)
   , SaveTransactionResponse(..)
+  , SaveTransactionsResponse(..)
   )
 import Models.ScheduledTransaction
   ( ScheduledTransaction(..)
@@ -86,9 +90,22 @@ main = do
                 print "successfully got /accounts/{account_id}/transactions"
 
           -- | test POST /transactions
-          (postTransaction bId (SaveTransaction aId "2018-09-29" (-000010))) >>= \case
+          let transaction = SaveTransaction aId "2018-09-29" (-000010) Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+          (postTransaction bId (SaveTransactionWrapper transaction)) >>= \case
               Left err -> print err
               Right (SaveTransactionResponse r) -> do
+                print "successfully posted /accounts/{account_id}/transactions"
+                print r
+
+          let transactions = [ (SaveTransaction aId "2018-09-29" (-000020) Nothing Nothing
+                                Nothing (Just "delete me")  Nothing Nothing Nothing Nothing)
+                             , (SaveTransaction aId "2018-09-29" (-000030) Nothing Nothing
+                                Nothing (Just "delete me")  Nothing Nothing Nothing Nothing)
+                             , (SaveTransaction aId "2018-09-29" (-000040) Nothing Nothing
+                                Nothing (Just "delete me")  Nothing Nothing Nothing Nothing)]
+          (postTransactions bId (SaveTransactionsWrapper transactions)) >>= \case
+              Left err -> print err
+              Right (SaveTransactionsResponse r) -> do
                 print "successfully posted /accounts/{account_id}/transactions"
                 print r
 
