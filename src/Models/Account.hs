@@ -3,6 +3,7 @@ module Models.Account
   ( Account(..)
   , AccountsSummaryResponse(..)
   , AccountDetailResponse(..)
+  , AccountId
   ) where
 
 import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
@@ -25,8 +26,10 @@ instance FromJSON AccountDetailResponse where
     accountObj <- respObj .: "account"
     return (AccountDetailResponse accountObj)
 
+type AccountId = Text
+
 data Account = Account
-  { accountId               :: !Text
+  { accountId               :: !AccountId
   , accountName             :: !Text
   , accountType             :: !Text
   , accountOnBudget         :: !Bool

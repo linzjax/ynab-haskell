@@ -5,12 +5,26 @@ module Models.Transaction
   , TransactionsResponse(..)
   , TransactionResponse(..)
   , Subtransaction(..)
+  , SaveTransaction(..)
+  , SaveTransactionResponse(..)
   ) where
 
 --
-import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
+import Data.Aeson
+  ( FromJSON(..)
+  , ToJSON(..)
+  , Value(..)
+  , object
+  , (.:)
+  , (.:?)
+  , (.=)
+  )
 import Data.Aeson.Types (typeMismatch)
 import Data.Text (Text)
+
+import Models.Payee (PayeeId)
+import Models.Account (AccountId)
+import Models.Category (CategoryId)
 
 data TransactionsResponse = TransactionsResponse [Transaction] deriving Show
 
@@ -86,3 +100,42 @@ instance FromJSON Subtransaction where
     o .:? "transfer_account_id" <*>
     o .: "deleted"
   parseJSON invalid = typeMismatch "Subtransaction" invalid
+
+data SaveTransactionResponse = SaveTransactionResponse SaveTransactionWrapper deriving Show
+
+instance FromJSON SaveTransactionResponse where
+  parseJSON (Object o) = do
+    respObj <- o .: "data"
+    return (SaveTransactionResponse respObj)
+  parseJSON invalid = typeMismatch "SaveTransactionResponse" invalid
+
+data SaveTransactionWrapper = SaveTransactionWrapper [TransactionId] Transaction deriving Show
+
+instance FromJSON SaveTransactionWrapper where
+  parseJSON (Object o) = SaveTransactionWrapper <$>
+    o .: "transaction_ids" <*>
+    o .: "transaction"
+  parseJSON invalid = typeMismatch "SaveTransactionWrapper" invalid
+
+data SaveTransaction = SaveTransaction
+  { saveAccountId   :: !AccountId
+  , saveDate        :: !Text
+  , saveAmount      :: !Int
+  -- , savePayeeId     :: !(Maybe PayeeId)
+  -- , savePayeeName   :: !(Maybe Text)
+  -- , saveCategoryId  :: !(Maybe CategoryId)
+  -- , saveMemo        :: !(Maybe Text)
+  -- , saveCleared     :: !(Maybe Text) -- [cleared, uncleared, reconciled]
+  -- , savedApproved   :: !(Maybe Bool)
+  -- , saveFlagColor   :: !(Maybe Text) -- [red, orange, yellow, green, blue, purple]
+  -- , saveImportId    :: !(Maybe Text) -- 'YNAB:-294230:2015-12-30:1’
+  }
+
+instance ToJSON SaveTransaction where
+  toJSON (SaveTransaction saId sDate sAmount) = object
+    ["transaction" .= object
+      [ "account_id" .= saId
+      , "date" .= sDate
+      , "amount" .= sAmount
+      ]
+    ]

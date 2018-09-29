@@ -32,6 +32,7 @@ import Client
   , getTransactionsByCategory
   , getTransactionsByPayee
   , getTransactionById
+  , postTransaction
   , getScheduledTransactions
   , getScheduledTransactionById
   )
@@ -54,6 +55,8 @@ import Models.Transaction
   ( Transaction(..)
   , TransactionsResponse(..)
   , TransactionResponse(..)
+  , SaveTransaction(..)
+  , SaveTransactionResponse(..)
   )
 import Models.ScheduledTransaction
   ( ScheduledTransaction(..)
@@ -90,6 +93,7 @@ main = do
               Right (TransactionsResponse _) ->
                 print "successfully got /accounts/{account_id}/transactions"
 
+          (postTransaction bId (SaveTransaction aId "2018-09-29" (-000010))) >>= \case
 
       -- | test GET /categories
       (getCategories bId) >>= \case

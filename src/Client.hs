@@ -21,6 +21,7 @@ module Client
   , getTransactionsByCategory
   , getTransactionsByPayee
   , getTransactionById
+  , postTransaction
   , getScheduledTransactions
   , getScheduledTransactionById
   ) where
@@ -52,6 +53,7 @@ import Network.HTTP.Simple
   , Response(..)
   , Request(..)
   , httpLBS
+  , setRequestBodyJSON
   , getResponseStatusCode
   , getResponseHeader
   , getResponseBody)
@@ -83,6 +85,8 @@ import Models.Transaction
   ( TransactionsResponse(..)
   , TransactionResponse(..)
   , TransactionId
+  , SaveTransaction(..)
+  , SaveTransactionResponse(..)
   )
 import Models.ScheduledTransaction
   ( ScheduledTransactionsResponse(..)
@@ -120,6 +124,10 @@ processResponse :: (FromJSON b, Monad m)
 processResponse response =
   case (getResponseStatusCode response) of
     200 -> do
+      case (decode $ getResponseBody response) of
+        Just res -> return $ Right res
+        Nothing  -> return $ Left parseError
+    201 -> do
       case (decode $ getResponseBody response) of
         Just res -> return $ Right res
         Nothing  -> return $ Left parseError
@@ -213,6 +221,17 @@ getTransactionsByPayee bId pId = processRequest ["GET", bId, "payees", pId, "tra
 getTransactionById :: BudgetId -> TransactionId -> IO (Either YnabError TransactionResponse)
 getTransactionById bId tId = processRequest ["GET", bId, "transactions", tId]
 
+postTransaction :: BudgetId -> SaveTransaction -> IO (Either YnabError SaveTransactionResponse)
+postTransaction bId transaction = do
+  requestUrl <-  formatUrl ["POST", bId, "transactions"]
+  apiKey <- S8.pack . fromMaybe "" <$> lookupEnv "API_TOKEN"
+  let req = setRequestHeader "Authorization" ["Bearer " <> apiKey] . setRequestBodyJSON transaction $ requestUrl
+  response <- httpLBS req
+  print response
+  finalResponse <- processResponse response
+  return finalResponse
+
+-- postTransactions :: BudgetId -> [SaveTransactions] -> IO (Either YnabError SaveTransactionSummaryResponse)
 
 -- updateTransaction - budgetId transactionId Transaction
 -- createTrasnaction - budgetId Transaction

@@ -4,6 +4,7 @@ module Models.Category
   , CategoriesResponse(..)
   , Category(..)
   , CategoryResponse(..)
+  , CategoryId
   ) where
 
 import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
@@ -46,8 +47,10 @@ instance FromJSON CategoryResponse where
     return $ CategoryResponse catObj
   parseJSON invalid = typeMismatch "CategoryResponse" invalid
 
+type CategoryId = Text
+
 data Category = Category
-  { categoryId                      :: !Text
+  { categoryId                      :: !CategoryId
   , categoryCGId                    :: !Text -- | TODO: This should be a reference to a CategoryGroup
   , categoryName                    :: !Text
   , categoryHidden                  :: !Bool
