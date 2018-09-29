@@ -26,36 +26,23 @@ module Client
   , getScheduledTransactionById
   ) where
 
-import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Catch (MonadThrow(..))
 import Data.Aeson
-  ( Value
-  , FromJSON(..)
-  , Object(..)
-  , Value(..)
+  ( FromJSON(..)
   , decode
-  , withObject
-  , (.:)
   )
 import qualified Data.ByteString.Char8 as S8
-import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Lazy.Internal as L
-import Data.Maybe (fromMaybe)
--- import qualified Data.HashMap as M
-import Data.HashMap.Strict (toList)
 import qualified Data.Text as T
--- import qualified Data.Yaml as Yaml
 import Data.Maybe (fromMaybe)
-import GHC.Generics (Generic)
 import Network.HTTP.Simple
   ( setRequestHeader
   , parseRequest
-  , Response(..)
-  , Request(..)
+  , Response
+  , Request
   , httpLBS
   , setRequestBodyJSON
   , getResponseStatusCode
-  , getResponseHeader
   , getResponseBody)
 import System.Environment (lookupEnv)
 

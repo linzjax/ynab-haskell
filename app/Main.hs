@@ -2,15 +2,6 @@
 
 module Main where
 
-import Control.Monad.IO.Class (liftIO)
-import Data.Aeson (Value)
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.Yaml             as Yaml
-import Data.Maybe (fromMaybe)
-import Data.Text (pack)
-import Network.HTTP.Simple
-import System.Environment (lookupEnv)
-
 import Client
   ( getUser
   , getBudgets
@@ -43,13 +34,12 @@ import Models.Category ( CategoriesResponse(..), CategoryGroup(..)
 import Models.Payee
   ( PayeesResponse(..)
   , PayeeResponse(..)
-  , Payee(..)
   , PayeeLocationsResponse(..)
   , PayeeLocationResponse(..)
-  , PayeeLocation(..))
+  , Payee(..)
+  )
 import Models.Month
-  ( Month(..)
-  , MonthSummariesResponse(..)
+  ( MonthSummariesResponse(..)
   , MonthDetailResponse(..))
 import Models.Transaction
   ( Transaction(..)
@@ -74,26 +64,33 @@ main = do
     Right (BudgetSummaryResponse budgetList) -> do
       print "successfully got /budgets"
       let bId = budgetId . head $ budgetList
+      print "Budget: "
+      print bId
 
       -- | test GET /accounts
       (getAccounts bId) >>= \case
-         Left err -> print err
-         Right (AccountsSummaryResponse accountList) -> do
-           print "successfully got /accounts"
-           let aId = accountId . head $ accountList
+        Left err -> print err
+        Right (AccountsSummaryResponse accountList) -> do
+          print "successfully got /accounts"
+          let aId = accountId . head $ accountList
            -- | test GET /accounts/<accountId>
-           (getAccountById bId aId) >>= \case
+          (getAccountById bId aId) >>= \case
               Left err -> print err
               Right (AccountDetailResponse _)  -> do
                 print "successfully got /accounts/<aId>"
 
            -- | test GET /accounts/{account_id}/transactions
-           (getTransactionsByAccount bId aId) >>= \case
+          (getTransactionsByAccount bId aId) >>= \case
               Left err -> print err
               Right (TransactionsResponse _) ->
                 print "successfully got /accounts/{account_id}/transactions"
 
+          -- | test POST /transactions
           (postTransaction bId (SaveTransaction aId "2018-09-29" (-000010))) >>= \case
+              Left err -> print err
+              Right (SaveTransactionResponse r) -> do
+                print "successfully posted /accounts/{account_id}/transactions"
+                print r
 
       -- | test GET /categories
       (getCategories bId) >>= \case

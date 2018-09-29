@@ -33,6 +33,7 @@ instance FromJSON TransactionsResponse where
     respObj <- o .: "data"
     transactionsObj <- respObj .: "transactions"
     return (TransactionsResponse transactionsObj)
+  parseJSON invalid = typeMismatch "TransactionsResponse" invalid
 
 data TransactionResponse = TransactionResponse Transaction deriving Show
 
@@ -41,6 +42,7 @@ instance FromJSON TransactionResponse where
     respObj <- o .: "data"
     transactionObj <- respObj .: "transaction"
     return (TransactionResponse transactionObj)
+  parseJSON invalid = typeMismatch "TransactionResponse" invalid
 
 type TransactionId = Text
 
@@ -52,10 +54,10 @@ data Transaction = Transaction
   , transactionCleared           :: !Text -- | TODO: Does this have specific responses?
   , transactionApproved          :: !Bool
   , transactionFlagColor         :: !(Maybe Text) -- | TODO: Does this have specific responses?
-  , transactionAccountId         :: !Text -- | TODO: This should refer to an Account obj.
-  , transactionPayeeId           :: !(Maybe Text) -- | TODO: This should refer to an Payee obj.
-  , transactionCategoryId        :: !(Maybe Text) -- | TODO: This should refer to an Category obj.
-  , transactionTransferAccountId :: !(Maybe Text) -- | TODO: This should be an accont obj?
+  , transactionAccountId         :: !AccountId -- | TODO: This should refer to an Account obj.
+  , transactionPayeeId           :: !(Maybe PayeeId) -- | TODO: This should refer to an Payee obj.
+  , transactionCategoryId        :: !(Maybe CategoryId) -- | TODO: This should refer to an Category obj.
+  , transactionTransferAccountId :: !(Maybe AccountId) -- | TODO: This should be an accont obj?
   , transactionImportId          :: !(Maybe Text)
   , transactionDeleted           :: !Bool
   } deriving (Show)
@@ -77,15 +79,17 @@ instance FromJSON Transaction where
     o .: "deleted"
   parseJSON invalid = typeMismatch "Transaction" invalid
 
+-- TODO: Figure out how to convert string options "cleared", "uncleared", "reconciled" to ClearedTransaction
+-- data ClearedTransaction = Cleared | Uncleared | Reconciled deriving (Show, Read)
 
 data Subtransaction = Subtransaction
   { subtId                :: !Text
-  , subtTransactionId     :: !Text -- | TODO: This should connect to a transaction.
+  , subtTransactionId     :: !TransactionId -- | TODO: This should connect to a transaction.
   , subtAmount            :: !Int
   , subtMemo              :: !(Maybe Text)
-  , subtPayeeId           :: !(Maybe Text) -- | TODO: This should connect to a payee
-  , subtCategoryId        :: !(Maybe Text) -- | TODO: This should connect to a category
-  , subtTransferAccountId :: !(Maybe String) -- | TODO: This should connect to an Account
+  , subtPayeeId           :: !(Maybe PayeeId) -- | TODO: This should connect to a payee
+  , subtCategoryId        :: !(Maybe CategoryId) -- | TODO: This should connect to a category
+  , subtTransferAccountId :: !(Maybe AccountId) -- | TODO: This should connect to an Account
   , subtDeleted           :: !Bool
   } deriving (Show)
 
