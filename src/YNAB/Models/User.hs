@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.User (User(..)) where
+module YNAB.Models.User (User(..)) where
 
 import Data.Aeson (ToJSON(..), FromJSON(..), Value(..), (.:))
 import Data.Aeson.Types (typeMismatch)

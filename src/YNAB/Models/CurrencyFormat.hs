@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.CurrencyFormat ( CurrencyFormat(..)) where
+module YNAB.Models.CurrencyFormat ( CurrencyFormat(..)) where
 
 --
 import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.Transaction
+module YNAB.Models.Transaction
   ( Transaction(..)
   , TransactionId
   , TransactionsResponse(..)
@@ -9,6 +9,7 @@ module Models.Transaction
   , SaveTransactionWrapper(..)
   , SaveTransactionsWrapper(..)
   , SaveTransactionResponse(..)
+  , SaveTransactionResponseWrapper(..)
   , SaveTransactionsResponse(..)
   ) where
 
@@ -25,9 +26,9 @@ import Data.Aeson
 import Data.Aeson.Types (typeMismatch)
 import Data.Text (Text)
 
-import Models.Payee (PayeeId)
-import Models.Account (AccountId)
-import Models.Category (CategoryId)
+import YNAB.Models.Payee (PayeeId)
+import YNAB.Models.Account (AccountId)
+import YNAB.Models.Category (CategoryId)
 
 data TransactionsResponse = TransactionsResponse [Transaction] deriving Show
 

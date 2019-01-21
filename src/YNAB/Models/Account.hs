@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.Account
+module YNAB.Models.Account
   ( Account(..)
   , AccountsSummaryResponse(..)
   , AccountDetailResponse(..)
@@ -10,7 +10,7 @@ import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
 import Data.Aeson.Types (typeMismatch)
 import Data.Text (Text)
 
-data AccountsSummaryResponse = AccountsSummaryResponse [Account] deriving Show
+newtype AccountsSummaryResponse = AccountsSummaryResponse [Account] deriving Show
 
 instance FromJSON AccountsSummaryResponse where
   parseJSON (Object o) = do
@@ -18,7 +18,7 @@ instance FromJSON AccountsSummaryResponse where
     accountsObj <- respObj .: "accounts"
     return (AccountsSummaryResponse accountsObj)
 
-data AccountDetailResponse = AccountDetailResponse Account deriving Show
+newtype AccountDetailResponse = AccountDetailResponse Account deriving Show
 
 instance FromJSON AccountDetailResponse where
   parseJSON (Object o) = do

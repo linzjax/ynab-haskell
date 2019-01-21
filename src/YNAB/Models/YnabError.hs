@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.YnabError (YnabError(..)) where
+module YNAB.Models.YnabError (YnabError(..)) where
 
 import Data.Aeson (ToJSON(..), FromJSON(..), Value(..), (.:))
 import Data.Aeson.Types (typeMismatch)

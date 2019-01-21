@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.Category
+module YNAB.Models.Category
   ( CategoryGroup(..)
   , CategoriesResponse(..)
   , Category(..)
@@ -12,7 +12,7 @@ import Data.Aeson.Types (typeMismatch)
 import Data.Text (Text)
 
 
-data CategoriesResponse = CategoriesResponse [CategoryGroup] deriving Show
+newtype CategoriesResponse = CategoriesResponse [CategoryGroup] deriving Show
 
 instance FromJSON CategoriesResponse where
   parseJSON (Object o) = do
@@ -38,7 +38,7 @@ instance FromJSON CategoryGroup where
       o .: "categories"
   parseJSON invalid = typeMismatch "CategoryGroup" invalid
 
-data CategoryResponse = CategoryResponse Category deriving Show
+newtype CategoryResponse = CategoryResponse Category deriving Show
 
 instance FromJSON CategoryResponse where
   parseJSON (Object o) = do

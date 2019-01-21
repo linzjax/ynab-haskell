@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.ScheduledTransaction
+module YNAB.Models.ScheduledTransaction
   ( ScheduledTransaction(..)
   , ScheduledTransactionId
   , ScheduledTransactionsResponse(..)

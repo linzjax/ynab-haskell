@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.Month
+module YNAB.Models.Month
   ( Month(..)
   , MonthSummariesResponse(..)
   , MonthDetailResponse(..)
@@ -10,7 +10,7 @@ import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
 import Data.Aeson.Types (typeMismatch)
 import Data.Text (Text)
 
-import Models.Category (Category)
+import YNAB.Models.Category (Category)
 
 data MonthSummariesResponse = MonthSummariesResponse [Month] deriving Show
 

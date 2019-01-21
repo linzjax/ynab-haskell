@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.Payee
+module YNAB.Models.Payee
   ( PayeesResponse(..)
   , PayeeResponse(..)
   , Payee(..)

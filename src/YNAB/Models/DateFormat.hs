@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Models.DateFormat ( DateFormat(..)) where
+module YNAB.Models.DateFormat ( DateFormat(..)) where
 
 --
 import Data.Aeson (FromJSON(..), Value(..), (.:), (.:?))
